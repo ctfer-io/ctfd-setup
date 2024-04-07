@@ -58,6 +58,7 @@ jobs:
           mkdir $COVERDIR
           GOCOVERDIR=$COVERDIR ./ctfd-setup
           go tool covdata textfmt -i=$COVERDIR -o cov.out
+          cat cov.out
         env:
           CTFD_URL: http://localhost:8000
       
