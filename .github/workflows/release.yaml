@@ -17,19 +17,18 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@9bb56186c3b09b4f86b1c65136769dd318469633 # v4.1.2
         with:
           fetch-depth: 0
       - name: Set up Go
-        uses: actions/setup-go@0c52d547c9bc32b1aa3301fd7a9cb496313a4491
+        uses: actions/setup-go@0c52d547c9bc32b1aa3301fd7a9cb496313a4491 # v5.0.0
         with:
           go-version-file: 'go.mod'
       - name: Install Syft
-        run: |
-          curl -sSfL https://raw.githubusercontent.com/anchore/syft/main/install.sh | sh -s -- -b /usr/local/bin
+        uses: anchore/sbom-action/download-syft@ab5d7b5f48981941c4c5d6bf33aeb98fe3bae38c # v0.15.10
       - name: Run GoReleaser
         id: run-goreleaser
-        uses: goreleaser/goreleaser-action@7ec5c2b0c6cdda6e8bbb49444bc797dd33d74dd8
+        uses: goreleaser/goreleaser-action@7ec5c2b0c6cdda6e8bbb49444bc797dd33d74dd8 # v5.0.0
         with:
           version: latest
           args: release --clean
@@ -43,6 +42,6 @@ jobs:
       id-token: write # To sign.
       contents: write # To upload release assets.
       actions: read   # To read workflow path.
-    uses: slsa-framework/slsa-github-generator/.github/workflows/builder_go_slsa3.yml@v1.10.0
+    uses: slsa-framework/slsa-github-generator/.github/workflows/builder_go_slsa3.yml@c747fe7769adf3656dc7d588b161cb614d7abfee # v1.10.0
     with:
       go-version-file: 'go.mod'

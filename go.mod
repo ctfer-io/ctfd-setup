@@ -1,6 +1,6 @@
 module github.com/ctfer-io/ctfd-setup
 
-go 1.22.1
+go 1.22.2
 
 require (
 	github.com/ctfer-io/go-ctfd v0.4.0
