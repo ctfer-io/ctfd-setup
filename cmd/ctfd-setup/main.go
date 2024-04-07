@@ -2,16 +2,16 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"os"
 	"os/signal"
 	"syscall"
 
+	ctfdsetup "github.com/ctfer-io/ctfd-setup"
 	"github.com/ctfer-io/go-ctfd/api"
-	ctfdsetup "github.com/pandatix/ctfd-setup"
 	"github.com/pkg/errors"
 	"github.com/urfave/cli/v2"
+	"go.uber.org/zap"
 	"gopkg.in/yaml.v3"
 )
 
@@ -67,10 +67,13 @@ func main() {
 }
 
 func run(ctx *cli.Context) error {
+	log := ctfdsetup.Log()
+
 	// Read and unmarshal setup config file
 	raw := []byte(ctfdsetup.DefaultConf)
 	if ctx.IsSet("file") {
 		f := ctx.String("file")
+		log.Info("getting configuration file", zap.String("file", f))
 		b, err := os.ReadFile(f)
 		if err != nil {
 			return errors.Wrapf(err, "reading file %s", f)
@@ -82,10 +85,10 @@ func run(ctx *cli.Context) error {
 	if err := yaml.Unmarshal(raw, &conf); err != nil {
 		return errors.Wrap(err, "unmarshalling configuration")
 	}
-	fmt.Printf("conf: %+v\n", conf)
 
 	// Connect to CTFd
 	url := ctx.String("url")
+	log.Info("setting up CTFd instance", zap.String("url", url))
 	nonce, session, err := api.GetNonceAndSession(url, api.WithContext(ctx.Context))
 	if err != nil {
 		return errors.Wrap(err, "getting CTFd nonce and session")
