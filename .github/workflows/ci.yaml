@@ -1,0 +1,78 @@
+name: CI
+
+on: [push, pull_request]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    services:
+      ctfd:
+        image: ctfd/ctfd:3.7.0@sha256:e4e886aa8f1051eeddcabe2115bc9a5f380be2b54034d5a119c44b177d6b8c57
+        ports:
+          - 8000:8000
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@9bb56186c3b09b4f86b1c65136769dd318469633 # v4.1.2
+
+      - name: Setup Go
+        uses: actions/setup-go@0c52d547c9bc32b1aa3301fd7a9cb496313a4491 # v5.0.0
+        with:
+          go-version-file: go.mod
+
+      - name: Cache go modules
+        uses: actions/cache@0c45773b623bea8c8e75f6c82b208c3cf94ea4f9 # v4.0.2
+        with:
+          path: ~/go/pkg/mod
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: ${{ runner.os }}-go-
+
+      - name: Wait for CTFd server
+        run: |
+          max_attempts=60
+          base_url="http://localhost:8000"
+          for ((i=0; i<$max_attempts; i++)); do
+            if curl --head --fail --silent --show-error "$base_url" >/dev/null; then
+              echo "Server is up and running!"
+              break
+            else
+              echo "Waiting for the server to respond... (attempt $((i+1)))"
+              sleep 5
+            fi
+          done
+          if [ $i -eq $max_attempts ]; then
+            echo "Server did not respond within the allotted time. Exiting..."
+            exit 1
+          fi
+
+      - name: Setup CTFd
+        run: |
+          go build -cover -o ctfd-setup cmd/ctfd-setup/main.go
+          export COVERDIR="cover"
+          mkdir $COVERDIR
+          GOCOVERDIR=$COVERDIR ./ctfd-setup
+          go tool covdata textfmt -i=$COVERDIR -o cov.out
+        env:
+          CTFD_URL: http://localhost:8000
+      
+      - name: Upload coverage to Coveralls
+        uses: shogo82148/actions-goveralls@785c9d68212c91196d3994652647f8721918ba11 # v1.9.0
+        with:
+          path-to-profile: cov.out
+
+  go-lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@9bb56186c3b09b4f86b1c65136769dd318469633 # v4.1.2
+      - uses: actions/setup-go@0c52d547c9bc32b1aa3301fd7a9cb496313a4491 # v5.0.0
+        with:
+          go-version-file: go.mod
+      
+      - name: go-lint
+        uses: golangci/golangci-lint-action@3cfe3a4abbb849e10058ce4af15d205b6da42804 # v4.0.0
