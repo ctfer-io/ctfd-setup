@@ -32,13 +32,13 @@ func main() {
 			&cli.StringFlag{
 				Name:    "file",
 				Usage:   "Configuration file to use for setting up CTFd. If let empty, will default the values and look for secrets in expected environment variables. For more info, refers to the documentation.",
-				EnvVars: []string{"FILE"},
+				EnvVars: []string{"FILE", "PLUGIN_FILE"},
 			},
 			&cli.StringFlag{
 				Name:     "url",
 				Usage:    "URL to reach the CTFd instance.",
 				Required: true,
-				EnvVars:  []string{"CTFD_URL"},
+				EnvVars:  []string{"CTFD_URL", "PLUGIN_CTFD_URL"},
 			},
 		},
 		Action: run,
