@@ -1,0 +1,18 @@
+name: 'CTFd-Setup'
+author: 'ctfer-io'
+description: 'Setup a CTFd from a versionned configuration file'
+
+inputs:
+  file:
+    description: 'Configuration file to use for setting up CTFd. If let empty, will default the values and look for secrets in expected environment variables. For more info, refers to the documentation.'
+    required: false
+  url:
+    description: 'URL to reach the CTFd instance.'
+    required: true
+
+runs:
+  using: 'docker'
+  image: 'Dockerfile'
+  env:
+    FILE: ${{ inputs.file }}
+    CTFD_URL: ${{ inputs.url }}
