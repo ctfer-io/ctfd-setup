@@ -1,18 +1,76 @@
 name: 'CTFd-Setup'
 author: 'ctfer-io'
-description: 'Setup a CTFd from a versionned configuration file'
+description: 'Setup a CTFd from a versionned configuration file.'
 
 inputs:
   file:
     description: 'Configuration file to use for setting up CTFd. If let empty, will default the values and look for secrets in expected environment variables. For more info, refers to the documentation.'
-    required: false
+    default: '.ctfd.yaml'
   url:
     description: 'URL to reach the CTFd instance.'
     required: true
+  admin_email:
+    description: 'The administrator email address.'
+    required: true
+  admin_name:
+    description: 'The administrator name.'
+    required: true
+  admin_password:
+    description: 'The administrator password.'
+    required: true
+  front_banner:
+    description: 'The frontend banner. Provide a path to a locally-accessible file.'
+  front_logo:
+    description: 'The frontend logo. Provide a path to a locally-accessible file.'
+  front_small_icon:
+    description: 'The frontend small icon. Provide a path to a locally-accessible file.'
+  front_theme:
+    description: 'The frontend theme name.'
+    default: 'core'
+  front_theme_color:
+    description: 'The frontend theme color.'
+  global_description:
+    description: 'The description of your CTF, displayed as is.'
+  global_mode:
+    description: 'The mode of your CTFd, either users or teams.'
+    default: 'users'
+  global_name:
+    description: 'The name of your CTF, displayed as is.'
+    required: true
+  global_team_size:
+    description: 'The team size you want to enforce. Works only if global_mode is "teams".'
+  visibilities_account:
+    description: 'The visibility for the accounts. Please refer to CTFd documentation (https://docs.ctfd.io/docs/settings/visibility-settings/).'
+    default: 'public'
+  visibilities_challenge:
+    description: 'The visibility for the challenges. Please refer to CTFd documentation (https://docs.ctfd.io/docs/settings/visibility-settings/).'
+    default: 'public'
+  visibilities_registration:
+    description: 'The visibility for the registration. Please refer to CTFd documentation (https://docs.ctfd.io/docs/settings/visibility-settings/).'
+    default: 'public'
+  visibilities_score:
+    description: 'The visibility for the scoreboard. Please refer to CTFd documentation (https://docs.ctfd.io/docs/settings/visibility-settings/).'
+    default: 'public'
 
 runs:
   using: 'docker'
   image: 'Dockerfile'
   env:
     FILE: ${{ inputs.file }}
-    CTFD_URL: ${{ inputs.url }}
+    URL: ${{ inputs.url }}
+    ADMIN_EMAIL: ${{ inputs.admin_email }}
+    ADMIN_NAME: ${{ inputs.admin_name }}
+    ADMIN_PASSWORD: ${{ inputs.admin_password }}
+    FRONT_BANNER: ${{ inputs.front_banner }}
+    FRONT_LOGO: ${{ inputs.front_logo }}
+    FRONT_SMALL_ICON: ${{ inputs.front_small_icon }}
+    FRONT_THEME: ${{ inputs.front_theme }}
+    FRONT_THEME_COLOR: ${{ inputs.front_theme_color }}
+    GLOBAL_DESCRIPTION: ${{ inputs.global_description }}
+    GLOBAL_MODE: ${{ inputs.global_mode }}
+    GLOBAL_NAME: ${{ inputs.global_name }}
+    GLOBAL_TEAM_SIZE: ${{ inputs.global_team_size }}
+    VISIBILITIES_ACCOUNT: ${{ inputs.visibilities_account }}
+    VISIBILITIES_CHALLENGE: ${{ inputs.visibilities_challenge }}
+    VISIBILITIES_REGISTRATION: ${{ inputs.visibilities_registration }}
+    VISIBILITIES_SCORE: ${{ inputs.visibilities_score }}

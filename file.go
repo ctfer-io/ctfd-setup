@@ -2,36 +2,21 @@ package ctfdsetup
 
 import (
 	"os"
+	"path"
 
 	"github.com/ctfer-io/go-ctfd/api"
-	"gopkg.in/yaml.v3"
 )
 
-type File struct {
-	Name    string
-	Content []byte
-}
-
-// Make it able to be unmarshalled from YAML
-var _ yaml.Unmarshaler = (*Secret)(nil)
-
-func (file *File) UnmarshalYAML(node *yaml.Node) error {
-	f, err := os.ReadFile(node.Value)
+func File(loc *string) (*api.InputFile, error) {
+	if loc == nil || *loc == "" {
+		return nil, nil
+	}
+	b, err := os.ReadFile(*loc)
 	if err != nil {
-		return err
+		return nil, err
 	}
-	*file = File{
-		Name:    node.Value,
-		Content: f,
-	}
-	return nil
-}
-
-func (file File) ToInputFile() *api.InputFile {
-	if file.Name == "" { // file is not set
-		return nil
-	}
-
-	f := api.InputFile(file)
-	return &f
+	return &api.InputFile{
+		Name:    path.Base(*loc),
+		Content: b,
+	}, nil
 }

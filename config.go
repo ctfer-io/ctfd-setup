@@ -1,82 +1,84 @@
 package ctfdsetup
 
-import "fmt"
+import (
+	"fmt"
 
-const (
-	DefaultConf = `
-ctf_name:                "" # must be set
-ctf_description:         "" # must be set
-user_mode:               users
-visibilities:
-  challenge:    public
-  account:      public
-  score:        public
-  registration: public
-verify_emails:           true
-theme: core
-start: ""
-end:   ""
-# don't set team_size, logo, banner and small_icon by default
-
-admin:
-  name:
-    from_env: CTFD_ADMIN_NAME      # default admin name is fetched from this environment variable
-  email:
-    from_env: CTFD_ADMIN_EMAIL     # default admin email is fetched from this environment variable
-  password:
-    from_env: CTFD_ADMIN_PASSWORD  # default admin password is fetched from this environment variable
-`
+	"go.uber.org/multierr"
 )
 
-type Conf struct {
-	Name         string `yaml:"name"`
-	Description  string `yaml:"description"`
-	UserMode     string `yaml:"user_mode"`
+type (
+	Config struct {
+		Global       Global       `yaml:"global"`
+		Visibilities Visibilities `yaml:"visibilities"`
+		Front        Front        `yaml:"front"`
+		Admin        Admin        `yaml:"admin"`
+	}
+
+	Global struct {
+		Name         string `yaml:"name"`        // required
+		Description  string `yaml:"description"` // required
+		Mode         string `yaml:"mode"`
+		TeamSize     *int   `yaml:"team_size"`
+		VerifyEmails bool   `yaml:"verify_emails"`
+		Start        string `yaml:"start"`
+		End          string `yaml:"end"`
+	}
+
 	Visibilities struct {
 		Challenge    string `yaml:"challenge"`
 		Account      string `yaml:"account"`
 		Score        string `yaml:"score"`
 		Registration string `yaml:"registration"`
-	} `yaml:"visibilities"`
-	VerifyEmails bool   `yaml:"verify_emails"`
-	CTFTheme     string `yaml:"theme"`
-	ThemeColor   string `yaml:"theme_color"`
-	Start        string `yaml:"start"`
-	End          string `yaml:"end"`
-	TeamSize     *int   `yaml:"team_size,omitempty"`
-	CTFLogo      File   `yaml:"logo"`
-	CTFBanner    File   `yaml:"banner"`
-	CTFSmallIcon File   `yaml:"small_icon"`
-	Admin        struct {
-		Name     Secret `yaml:"name"`
-		Email    Secret `yaml:"email"`
-		Password Secret `yaml:"password"`
-	} `yaml:"admin"`
-}
-
-func (conf Conf) Validate() error {
-	if conf.Name == "" {
-		return ErrInvalidConf("name")
 	}
-	if conf.Description == "" {
-		return ErrInvalidConf("description")
+
+	Front struct {
+		Theme      string  `yaml:"theme"`
+		ThemeColor string  `yaml:"theme_color"`
+		Logo       *string `yaml:"logo"`
+		Banner     *string `yaml:"banner"`
+		SmallIcon  *string `yaml:"small_icon"`
+	}
+
+	Admin struct {
+		Name     string `yaml:"name"`     // required
+		Email    string `yaml:"email"`    // required
+		Password string `yaml:"password"` // required
+	}
+)
+
+func (conf Config) Validate() error {
+	var merr error
+	if conf.Global.Name == "" {
+		merr = multierr.Append(merr, &ErrRequired{Attribute: "global.name"})
+	}
+	if conf.Global.Description == "" {
+		merr = multierr.Append(merr, &ErrRequired{Attribute: "global.description"})
 	}
 	if conf.Admin.Name == "" {
-		return ErrInvalidConf("admin.name")
+		merr = multierr.Append(merr, &ErrRequired{Attribute: "admin.name"})
 	}
 	if conf.Admin.Email == "" {
-		return ErrInvalidConf("admin.email")
+		merr = multierr.Append(merr, &ErrRequired{Attribute: "admin.email"})
 	}
 	if conf.Admin.Password == "" {
-		return ErrInvalidConf("admin.password")
+		merr = multierr.Append(merr, &ErrRequired{Attribute: "admin.password"})
 	}
+	if merr != nil {
+		return merr
+	}
+
+	// Does not validate attributes content, let CTFd deal with
+	// that and provide a meaningful error message
+
 	return nil
 }
 
-type ErrInvalidConf string
+type ErrRequired struct {
+	Attribute string
+}
 
-var _ error = (*ErrInvalidConf)(nil)
+var _ error = (*ErrRequired)(nil)
 
-func (err ErrInvalidConf) Error() string {
-	return fmt.Sprintf("%s is invalid", string(err))
+func (err ErrRequired) Error() string {
+	return fmt.Sprintf("Required attribute %s was either not set or left to empty value", err.Attribute)
 }
