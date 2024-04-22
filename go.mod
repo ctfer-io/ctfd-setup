@@ -6,7 +6,7 @@ require (
 	github.com/ctfer-io/go-ctfd v0.6.2
 	github.com/pkg/errors v0.9.1
 	github.com/urfave/cli/v2 v2.27.1
-	go.uber.org/multierr v1.10.0
+	go.uber.org/multierr v1.11.0
 	go.uber.org/zap v1.27.0
 	gopkg.in/yaml.v3 v3.0.1
 )
