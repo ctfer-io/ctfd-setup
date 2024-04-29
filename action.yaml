@@ -9,68 +9,200 @@ inputs:
   url:
     description: 'URL to reach the CTFd instance.'
     required: true
-  admin_email:
-    description: 'The administrator email address.'
-    required: true
+  api_key:
+    description: 'The API key to use (for instance for a CI SA), used for updating a running CTFd instance.'
+  # Appearance
+  appearance_name:
+    description: 'The name of your CTF, displayed as is.'
+  appearance_description:
+    description: 'The description of your CTF, displayed as is.'
+  # Theme
+  theme_logo:
+    description: 'The frontend logo. Provide a path to a locally-accessible file.'
+  theme_small_icon:
+    description: 'The frontend small icon. Provide a path to a locally-accessible file.'
+  theme_name:
+    description: 'The frontend theme name.'
+  theme_color:
+    description: 'The frontend theme color.'
+  theme_header:
+    description: 'The frontend header. Provide a path to a locally-accessible file.'
+  theme_footer:
+    description: 'The frontend footer. Provide a path to a locally-accessible file.'
+  theme_settings:
+    description: 'The frontend settings (JSON). Provide a path to a locally-accessible file.'
+  # Accounts
+  accounts_domain_whitelist:
+    description: 'The domain whitelist (a list separated by colons) to allow users to have email addresses from.'
+  accounts_verify_emails:
+    description: 'Whether to verify emails once a user register or not.'
+  accounts_team_creation:
+    description: 'Whether to allow team creation by players or not.'
+  accounts_team_size:
+    description: 'Maximum size (number of players) in a team.'
+  accounts_num_teams:
+    description: 'The total number of teams allowed.'
+  accounts_num_users:
+    description: 'The total number of users allowed.'
+  accounts_team_disbanding:
+    description: 'Whether to allow teams to be disbanded or not. Could be inactive_only or disabled.'
+  accounts_incorrect_submissions_per_minute:
+    description: 'Maximum number of invalid submissions per minute (per user/team). We suggest you use it as part of an anti-brute-force strategy (rate limiting).'
+  accounts_name_changes:
+    description: 'Whether a user can change its name or not.'
+  # Pages
+  pages_robots_txt:
+    description: 'Define the /robots.txt file content, for web crawlers indexing.'
+  # MajorLeagueCyber
+  major_league_cyber_client_id:
+    description: 'The MajorLeagueCyber OAuth ClientID.'
+  major_league_cyber_client_secret:
+    description: 'The MajorLeagueCyber OAuth Client Secret.'
+  # Settings
+  settings_challenge_visibility:
+    description: 'The visibility for the challenges. Please refer to CTFd documentation (https://docs.ctfd.io/docs/settings/visibility-settings/).'
+  settings_account_visibility:
+    description: 'The visibility for the accounts. Please refer to CTFd documentation (https://docs.ctfd.io/docs/settings/visibility-settings/).'
+  settings_score_visibility:
+    description: 'The visibility for the scoreboard. Please refer to CTFd documentation (https://docs.ctfd.io/docs/settings/visibility-settings/).'
+  settings_registration_visibility:
+    description: 'The visibility for the registration. Please refer to CTFd documentation (https://docs.ctfd.io/docs/settings/visibility-settings/).'
+  settings_paused:
+    description: 'Whether the CTFd is paused or not.'
+  # Security
+  security_html_sanitization:
+    description: 'Whether to turn on HTML sanitization or not.'
+  security_registration_code:
+    description: 'The registration code (secret) to join the CTF.'
+  # Email
+  email_registration_subject:
+    description: 'The email registration subject of the mail.'
+  email_registration_body:
+    description: 'The email registration body of the mail.'
+  email_confirmation_subject:
+    description: 'The email confirmation subject of the mail.'
+  email_confirmation_body:
+    description: 'The email confirmation body of the mail.'
+  email_new_account_subject:
+    description: 'The email new_account subject of the mail.'
+  email_new_account_body:
+    description: 'The email new_account body of the mail.'
+  email_password_reset_subject:
+    description: 'The email password_reset subject of the mail.'
+  email_password_reset_body:
+    description: 'The email password_reset body of the mail.'
+  email_password_reset_confirmation_subject:
+    description: 'The email password_reset_confirmation subject of the mail.'
+  email_password_reset_confirmation_body:
+    description: 'The email password_reset_confirmation body of the mail.'
+  email_from:
+    description: 'The ''From:'' to sent to mail with.'
+  email_server:
+    description: 'The mail server to use.'
+  email_port:
+    description: 'The mail server port to reach.'
+  email_username:
+    description: 'The username to log in to the mail server.'
+  email_password:
+    description: 'The password to log in to the mail server.'
+  email_tls_ssl:
+    description: 'Whether to turn on TLS/SSL or not.'
+  email_starttls:
+    description: 'Whether to turn on STARTTLS or not.'
+  # Time
+  time_start:
+    description: 'The start timestamp at which the CTFd will open.'
+  time_end:
+    description: 'The end timestamp at which the CTFd will close.'
+  time_freeze:
+    description: 'The freeze timestamp at which the CTFd will remain open but won''t accept any further submissions.'
+  time_view_after:
+    description: 'Whether allows users to view challenges after end or not.'
+  # Social
+  social_shares:
+    description: 'Whether to enable users share they solved a challenge or not.'
+  # Legal
+  legal_tos_url:
+    description: 'The Terms of Services URL.'
+  legal_tos_content:
+    description: 'The Terms of Services content'
+  legal_privacy_policy_url:
+    description: 'The Privacy Policy URL.'
+  legal_privacy_policy_content:
+    description: 'The Privacy Policy content.'
+  # UserMode
+  mode:
+    description: 'The mode of your CTFd, either users or teams.'
+  # Admin
   admin_name:
     description: 'The administrator name.'
-    required: true
+  admin_email:
+    description: 'The administrator email address.'
   admin_password:
     description: 'The administrator password.'
-    required: true
-  front_banner:
-    description: 'The frontend banner. Provide a path to a locally-accessible file.'
-  front_logo:
-    description: 'The frontend logo. Provide a path to a locally-accessible file.'
-  front_small_icon:
-    description: 'The frontend small icon. Provide a path to a locally-accessible file.'
-  front_theme:
-    description: 'The frontend theme name.'
-    default: 'core'
-  front_theme_color:
-    description: 'The frontend theme color.'
-  global_description:
-    description: 'The description of your CTF, displayed as is.'
-  global_mode:
-    description: 'The mode of your CTFd, either users or teams.'
-    default: 'users'
-  global_name:
-    description: 'The name of your CTF, displayed as is.'
-    required: true
-  global_team_size:
-    description: 'The team size you want to enforce. Works only if global_mode is "teams".'
-  visibilities_account:
-    description: 'The visibility for the accounts. Please refer to CTFd documentation (https://docs.ctfd.io/docs/settings/visibility-settings/).'
-    default: 'public'
-  visibilities_challenge:
-    description: 'The visibility for the challenges. Please refer to CTFd documentation (https://docs.ctfd.io/docs/settings/visibility-settings/).'
-    default: 'public'
-  visibilities_registration:
-    description: 'The visibility for the registration. Please refer to CTFd documentation (https://docs.ctfd.io/docs/settings/visibility-settings/).'
-    default: 'public'
-  visibilities_score:
-    description: 'The visibility for the scoreboard. Please refer to CTFd documentation (https://docs.ctfd.io/docs/settings/visibility-settings/).'
-    default: 'public'
 
 runs:
   using: 'docker'
-  image: 'Dockerfile'
+  image: 'ctferio/ctfd-setup:v1.0.0'
   env:
     FILE: ${{ inputs.file }}
     URL: ${{ inputs.url }}
-    ADMIN_EMAIL: ${{ inputs.admin_email }}
+    API_KEY: ${{ inputs.api_key }}
+    APPEARANCE_NAME: ${{ inputs.appearance_name }}
+    APPEARANCE_DESCRIPTION: ${{ inputs.appearance_description }}
+    THEME_LOGO: ${{ inputs.theme_logo }}
+    THEME_SMALL_ICON: ${{ inputs.theme_small_icon }}
+    THEME_NAME: ${{ inputs.theme_name }}
+    THEME_COLOR: ${{ inputs.theme_color }}
+    THEME_HEADER: ${{ inputs.theme_header }}
+    THEME_FOOTER: ${{ inputs.theme_footer }}
+    THEME_SETTINGS: ${{ inputs.theme_settings }}
+    ACCOUNTS_DOMAIN_WHITELIST: ${{ inputs.accounts_domain_whitelist }}
+    ACCOUNTS_VERIFY_EMAILS: ${{ inputs.accounts_verify_emails }}
+    ACCOUNTS_TEAM_CREATION: ${{ inputs.accounts_team_creation }}
+    ACCOUNTS_TEAM_SIZE: ${{ inputs.accounts_team_size }}
+    ACCOUNTS_NUM_TEAMS: ${{ inputs.accounts_num_teams }}
+    ACCOUNTS_NUM_USERS: ${{ inputs.accounts_num_users }}
+    ACCOUNTS_TEAM_DISBANDING: ${{ inputs.accounts_team_disbanding }}
+    ACCOUNTS_INCORRECT_SUBMISSIONS_PER_MINUTE: ${{ inputs.accounts_incorrect_submissions_per_minute }}
+    ACCOUNTS_NAME_CHANGES: ${{ inputs.accounts_name_changes }}
+    PAGES_ROBOTS_TXT: ${{ inputs.pages_robots_txt }}
+    MAJOR_LEAGUE_CYBER_CLIENT_ID: ${{ inputs.major_league_cyber_client_id }}
+    MAJOR_LEAGUE_CYBER_CLIENT_SECRET: ${{ inputs.major_league_cyber_client_secret }}
+    SETTINGS_CHALLENGE_VISIBILITY: ${{ inputs.settings_challenge_visibility }}
+    SETTINGS_ACCOUNT_VISIBILITY: ${{ inputs.settings_account_visibility }}
+    SETTINGS_SCORE_VISIBILITY: ${{ inputs.settings_score_visibility }}
+    SETTINGS_REGISTRATION_VISIBILITY: ${{ inputs.settings_registration_visibility }}
+    SETTINGS_PAUSED: ${{ inputs.settings_paused }}
+    SECURITY_HTML_SANITIZATION: ${{ inputs.security_html_sanitization }}
+    SECURITY_REGISTRATION_CODE: ${{ inputs.security_registration_code }}
+    EMAIL_REGISTRATION_SUBJECT: ${{ inputs.email_registration_subject }}
+    EMAIL_REGISTRATION_BODY: ${{ inputs.email_registration_body }}
+    EMAIL_CONFIRMATION_SUBJECT: ${{ inputs.email_confirmation_subject }}
+    EMAIL_CONFIRMATION_BODY: ${{ inputs.email_confirmation_body }}
+    EMAIL_NEW_ACCOUNT_SUBJECT: ${{ inputs.email_new_account_subject }}
+    EMAIL_NEW_ACCOUNT_BODY: ${{ inputs.email_new_account_body }}
+    EMAIL_PASSWORD_RESET_SUBJECT: ${{ inputs.email_password_reset_subject }}
+    EMAIL_PASSWORD_RESET_BODY: ${{ inputs.email_password_reset_body }}
+    EMAIL_PASSWORD_RESET_CONFIRMATION_SUBJECT: ${{ inputs.email_password_reset_confirmation_subject }}
+    EMAIL_PASSWORD_RESET_CONFIRMATION_BODY: ${{ inputs.email_password_reset_confirmation_body }}
+    EMAIL_MAIL_FROM: ${{ inputs.email_from }}
+    EMAIL_MAIL_SERVER: ${{ inputs.email_server }}
+    EMAIL_MAIL_SERVER_PORT: ${{ inputs.email_port }}
+    EMAIL_USERNAME: ${{ inputs.email_username }}
+    EMAIL_PASSWORD: ${{ inputs.email_password }}
+    EMAIL_TLS_SSL: ${{ inputs.email_tls_ssl }}
+    EMAIL_STARTTLS: ${{ inputs.email_starttls }}
+    TIME_START: ${{ inputs.time_start }}
+    TIME_END: ${{ inputs.time_end }}
+    TIME_FREEZE: ${{ inputs.time_freeze }}
+    TIME_VIEW_AFTER: ${{ inputs.time_view_after }}
+    SOCIAL_SHARES: ${{ inputs.social_shares }}
+    LEGAL_TOS_URL: ${{ inputs.legal_tos_url }}
+    LEGAL_TOS_CONTENT: ${{ inputs.legal_tos_content }}
+    LEGAL_PRIVACY_POLICY_URL: ${{ inputs.legal_privacy_policy_url }}
+    LEGAL_PRIVACY_POLICY_CONTENT: ${{ inputs.legal_privacy_policy_content }}
+    MODE: ${{ inputs.mode }}
     ADMIN_NAME: ${{ inputs.admin_name }}
+    ADMIN_EMAIL: ${{ inputs.admin_email }}
     ADMIN_PASSWORD: ${{ inputs.admin_password }}
-    FRONT_BANNER: ${{ inputs.front_banner }}
-    FRONT_LOGO: ${{ inputs.front_logo }}
-    FRONT_SMALL_ICON: ${{ inputs.front_small_icon }}
-    FRONT_THEME: ${{ inputs.front_theme }}
-    FRONT_THEME_COLOR: ${{ inputs.front_theme_color }}
-    GLOBAL_DESCRIPTION: ${{ inputs.global_description }}
-    GLOBAL_MODE: ${{ inputs.global_mode }}
-    GLOBAL_NAME: ${{ inputs.global_name }}
-    GLOBAL_TEAM_SIZE: ${{ inputs.global_team_size }}
-    VISIBILITIES_ACCOUNT: ${{ inputs.visibilities_account }}
-    VISIBILITIES_CHALLENGE: ${{ inputs.visibilities_challenge }}
-    VISIBILITIES_REGISTRATION: ${{ inputs.visibilities_registration }}
-    VISIBILITIES_SCORE: ${{ inputs.visibilities_score }}
