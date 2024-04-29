@@ -27,7 +27,7 @@ Thanks to this, you can integrate it using **GitHub Actions**, **Drone CI** or e
 For the CLI configuration, please refer to the binary's specific API through `ctfd-setup --help`.
 In use of IaC provisionning scenario, the corresponding environment variables are also mapped to the output, so please refer to it.
 
-### GitHub Actions
+### GitHub Actions
 
 To improve our own workflows and share knownledges and tooling, we built a GitHub Action: `ctfer-io/ctfd-setup`.
 You can use it given the following example.

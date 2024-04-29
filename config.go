@@ -8,35 +8,113 @@ import (
 
 type (
 	Config struct {
-		Global       Global       `yaml:"global"`
-		Visibilities Visibilities `yaml:"visibilities"`
-		Front        Front        `yaml:"front"`
-		Admin        Admin        `yaml:"admin"`
+		Appearance Appearance `yaml:"appearance"`
+		Theme      Theme      `yaml:"theme"`
+		Accounts   Accounts   `yaml:"accounts"`
+		Pages      Pages      `yaml:"pages"`
+		// Don't handle brackets here, should not be part of those settings but CRUD objects
+		// CustomFields are not handled as they are not predictable and would be hard to handle + bad practice (API changes on the fly)
+		MajorLeagueCyber MajorLeagueCyber `yaml:"major_league_cyber"`
+		Settings         Settings         `yaml:"settings"`
+		Security         Security         `yaml:"security"`
+		Email            Email            `yaml:"email"`
+		Time             Time             `yaml:"time"`
+		Social           Social           `yaml:"social"`
+		Legal            Legal            `yaml:"legal"`
+		Mode             string           `yaml:"mode"`
+
+		Admin Admin `yaml:"admin"`
 	}
 
-	Global struct {
-		Name         string `yaml:"name"`        // required
-		Description  string `yaml:"description"` // required
-		Mode         string `yaml:"mode"`
-		TeamSize     *int   `yaml:"team_size"`
-		VerifyEmails bool   `yaml:"verify_emails"`
-		Start        string `yaml:"start"`
-		End          string `yaml:"end"`
+	Appearance struct {
+		Name        string `yaml:"name"`        // required
+		Description string `yaml:"description"` // required
 	}
 
-	Visibilities struct {
-		Challenge    string `yaml:"challenge"`
-		Account      string `yaml:"account"`
-		Score        string `yaml:"score"`
-		Registration string `yaml:"registration"`
+	Theme struct {
+		Logo      *File  `yaml:"logo"`
+		SmallIcon *File  `yaml:"small_icon"`
+		Name      string `yaml:"name"`
+		Color     string `yaml:"color"`
+		// Banner is only supported by bare setup, need to be at least support by PatchConfigs
+		Header   *File `yaml:"header"`
+		Footer   *File `yaml:"footer"`
+		Settings *File `yaml:"settings"`
 	}
 
-	Front struct {
-		Theme      string  `yaml:"theme"`
-		ThemeColor string  `yaml:"theme_color"`
-		Logo       *string `yaml:"logo"`
-		Banner     *string `yaml:"banner"`
-		SmallIcon  *string `yaml:"small_icon"`
+	Accounts struct {
+		DomainWhitelist               *string `yaml:"domain_whitelist"`
+		VerifyEmails                  bool    `yaml:"verify_emails"`
+		TeamCreation                  *bool   `yaml:"team_creation"`
+		TeamSize                      *int    `yaml:"team_size"`
+		NumTeams                      *int    `yaml:"num_teams"`
+		NumUsers                      *int    `yaml:"num_users"`
+		TeamDisbanding                *string `yaml:"team_disbanding"`
+		IncorrectSubmissionsPerMinute *int    `yaml:"incorrect_submissions_per_minutes"`
+		NameChanges                   *bool   `yaml:"name_changes"`
+	}
+
+	Pages struct {
+		RobotsTxt *File `yaml:"robots_txt"`
+	}
+
+	MajorLeagueCyber struct {
+		ClientID     *string `yaml:"client_id"`
+		ClientSecret *string `yaml:"client_secret"`
+	}
+
+	Settings struct {
+		ChallengeVisibility    string `yaml:"challenge_visibility"`
+		AccountVisibility      string `yaml:"account_visibility"`
+		ScoreVisibility        string `yaml:"score_visibility"`
+		RegistrationVisibility string `yaml:"registration_visibility"`
+		Paused                 *bool  `yaml:"paused"`
+	}
+
+	Security struct {
+		HTMLSanitization *bool   `yaml:"html_sanitization"`
+		RegistrationCode *string `yaml:"registration_code"`
+	}
+
+	Email struct {
+		Registration              EmailContent `yaml:"registration"`
+		Confirmation              EmailContent `yaml:"confirmation"`
+		NewAccount                EmailContent `yaml:"new_account"`
+		PasswordReset             EmailContent `yaml:"password_reset"`
+		PasswordResetConfirmation EmailContent `yaml:"password_reset_confirmation"`
+		From                      *string      `yaml:"from"`
+		Server                    *string      `yaml:"server"`
+		Port                      *string      `yaml:"port"`
+		Username                  *string      `yaml:"username"`
+		Password                  *string      `yaml:"password"`
+		TLS_SSL                   *bool        `yaml:"tls_ssl"`
+		STARTTLS                  *bool        `yaml:"starttls"`
+	}
+
+	EmailContent struct {
+		Subject *string `yaml:"subject"`
+		Body    *string `yaml:"body"`
+	}
+
+	Time struct {
+		Start     *string `yaml:"start"`
+		End       *string `yaml:"end"`
+		Freeze    *string `yaml:"freeze"`
+		ViewAfter *bool   `yaml:"view_after"`
+	}
+
+	Social struct {
+		Shares *bool `yaml:"shares"`
+	}
+
+	Legal struct {
+		TOS           ExternalReference `yaml:"tos"`
+		PrivacyPolicy ExternalReference `yaml:"privacy_policy"`
+	}
+
+	ExternalReference struct {
+		URL     *string `yaml:"url"`
+		Content *string `yaml:"content"`
 	}
 
 	Admin struct {
@@ -48,11 +126,11 @@ type (
 
 func (conf Config) Validate() error {
 	var merr error
-	if conf.Global.Name == "" {
-		merr = multierr.Append(merr, &ErrRequired{Attribute: "global.name"})
+	if conf.Appearance.Name == "" {
+		merr = multierr.Append(merr, &ErrRequired{Attribute: "appearance.name"})
 	}
-	if conf.Global.Description == "" {
-		merr = multierr.Append(merr, &ErrRequired{Attribute: "global.description"})
+	if conf.Appearance.Description == "" {
+		merr = multierr.Append(merr, &ErrRequired{Attribute: "appearance.description"})
 	}
 	if conf.Admin.Name == "" {
 		merr = multierr.Append(merr, &ErrRequired{Attribute: "admin.name"})
@@ -68,7 +146,7 @@ func (conf Config) Validate() error {
 	}
 
 	// Does not validate attributes content, let CTFd deal with
-	// that and provide a meaningful error message
+	// that and provide a meaningful error message... if it can :)
 
 	return nil
 }

@@ -55,11 +55,11 @@ jobs:
         run: go run cmd/ctfd-setup/main.go
         env:
           URL: http://localhost:8000
+          APPEARANCE_NAME: 'CTFer.io'
+          APPEARANCE_DESCRIPTION: 'CTFer.io test CTFd setup'
           ADMIN_NAME: 'ctfer'
           ADMIN_EMAIL: 'ctfer-io@protonmail.com'
           ADMIN_PASSWORD: 'ctfer'
-          GLOBAL_NAME: 'CTFer.io'
-          GLOBAL_DESCRIPTION: 'CTFer.io test CTFd setup'
 
   go-lint:
     runs-on: ubuntu-latest

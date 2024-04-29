@@ -2,21 +2,37 @@ package ctfdsetup
 
 import (
 	"os"
-	"path"
 
-	"github.com/ctfer-io/go-ctfd/api"
+	"gopkg.in/yaml.v3"
 )
 
-func File(loc *string) (*api.InputFile, error) {
-	if loc == nil || *loc == "" {
-		return nil, nil
+type File struct {
+	Name    string
+	Content []byte
+}
+
+var _ yaml.Unmarshaler = (*File)(nil)
+
+func (file *File) UnmarshalYAML(node *yaml.Node) error {
+	if node.Value != "" {
+		file.Content = []byte(node.Value)
 	}
-	b, err := os.ReadFile(*loc)
+	type lfi struct {
+		FromFile *string `yaml:"from_file"`
+	}
+	var lfiv lfi
+	if err := node.Decode(&lfiv); err != nil {
+		return err
+	}
+
+	if lfiv.FromFile == nil {
+		return nil
+	}
+
+	fc, err := os.ReadFile(*lfiv.FromFile)
 	if err != nil {
-		return nil, err
+		return err
 	}
-	return &api.InputFile{
-		Name:    path.Base(*loc),
-		Content: b,
-	}, nil
+	file.Content = fc
+	return nil
 }
