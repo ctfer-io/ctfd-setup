@@ -91,7 +91,7 @@ func main() {
 			&cli.StringFlag{
 				Name:     "theme.color",
 				Usage:    "The frontend theme color.",
-				EnvVars:  []string{"THEME_THEME_COLOR", "PLUGIN_THEME_THEME_COLOR"},
+				EnvVars:  []string{"THEME_COLOR", "PLUGIN_THEME_COLOR"},
 				Category: configuration,
 			},
 			&cli.StringFlag{
@@ -191,28 +191,28 @@ func main() {
 			// => Settings
 			&cli.StringFlag{
 				Name:     "settings.challenge_visibility",
-				Usage:    "The visibility for the challenges. Please refer to CTFd documentation (https://docs.ctfd.io/docs/settings/visibility-settings/)",
+				Usage:    "The visibility for the challenges. Please refer to CTFd documentation (https://docs.ctfd.io/docs/settings/visibility-settings/).",
 				Value:    "public",
 				EnvVars:  []string{"SETTINGS_CHALLENGE_VISIBILITY", "PLUGIN_SETTINGS_CHALLENGE_VISIBILITY"},
 				Category: configuration,
 			},
 			&cli.StringFlag{
 				Name:     "settings.account_visibility",
-				Usage:    "The visibility for the accounts. Please refer to CTFd documentation (https://docs.ctfd.io/docs/settings/visibility-settings/)",
+				Usage:    "The visibility for the accounts. Please refer to CTFd documentation (https://docs.ctfd.io/docs/settings/visibility-settings/).",
 				Value:    "public",
 				EnvVars:  []string{"SETTINGS_ACCOUNT_VISIBILITY", "PLUGIN_SETTINGS_ACCOUNT_VISIBILITY"},
 				Category: configuration,
 			},
 			&cli.StringFlag{
 				Name:     "settings.score_visibility",
-				Usage:    "The visibility for the scoreboard. Please refer to CTFd documentation (https://docs.ctfd.io/docs/settings/visibility-settings/)",
+				Usage:    "The visibility for the scoreboard. Please refer to CTFd documentation (https://docs.ctfd.io/docs/settings/visibility-settings/).",
 				Value:    "public",
 				EnvVars:  []string{"SETTINGS_SCORE_VISIBILITY", "PLUGIN_SETTINGS_SCORE_VISIBILITY"},
 				Category: configuration,
 			},
 			&cli.StringFlag{
 				Name:     "settings.registration_visibility",
-				Usage:    "The visibility for the registration. Please refer to CTFd documentation (https://docs.ctfd.io/docs/settings/visibility-settings/)",
+				Usage:    "The visibility for the registration. Please refer to CTFd documentation (https://docs.ctfd.io/docs/settings/visibility-settings/).",
 				Value:    "public",
 				EnvVars:  []string{"SETTINGS_REGISTRATION_VISIBILITY", "PLUGIN_SETTINGS_REGISTRATION_VISIBILITY"},
 				Category: configuration,
@@ -270,7 +270,7 @@ func main() {
 			&cli.StringFlag{
 				Name:     "email.new_account.body",
 				Usage:    "The email new_account body of the mail.",
-				EnvVars:  []string{"EMAIL_REGISTRATION_BODY", "PLUGIN_EMAIL_REGISTRATION_BODY"},
+				EnvVars:  []string{"EMAIL_NEW_ACCOUNT_BODY", "PLUGIN_EMAIL_NEW_ACCOUNT_BODY"},
 				Category: configuration,
 			},
 			&cli.StringFlag{
