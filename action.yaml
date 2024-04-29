@@ -1,6 +1,9 @@
 name: 'CTFd-Setup'
 author: 'ctfer-io'
 description: 'Setup a CTFd from a versionned configuration file.'
+branding:
+  icon: 'flag'
+  color: 'red'
 
 inputs:
   file:
