@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"log"
 	"os"
 	"os/signal"
 	"path/filepath"
@@ -445,7 +444,7 @@ func main() {
 	defer stop()
 
 	if err := app.RunContext(ctx, os.Args); err != nil {
-		log.Fatal(err)
+		ctfdsetup.Log().Error("fatal error", zap.Error(err))
 	}
 }
 
@@ -578,11 +577,14 @@ func run(ctx *cli.Context) error {
 	log.Info("getting configuration file", zap.String("file", f))
 	if _, err := os.Stat(f); err == nil {
 		log.Info("configuration file found", zap.String("file", f))
-		b, err := os.ReadFile(f)
+		fd, err := os.Open(f)
 		if err != nil {
-			return errors.Wrapf(err, "reading file %s", f)
+			return errors.Wrapf(err, "opening file %s", f)
 		}
-		if err := yaml.Unmarshal(b, &conf); err != nil {
+		defer fd.Close()
+		dec := yaml.NewDecoder(fd)
+		dec.KnownFields(true)
+		if err := dec.Decode(&conf); err != nil {
 			return errors.Wrap(err, "unmarshalling configuration")
 		}
 	}
