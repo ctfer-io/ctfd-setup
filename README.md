@@ -17,8 +17,6 @@ Moreover, the setup API does not exist, so we had to map it to what the frontend
 To fit those gaps, we built `ctfd-setup` on top of the CTFd API. This utility helps setup a CTFd instance from a YAML configuration file, CLI flags and environment variables.
 Thanks to this, you can integrate it using **GitHub Actions**, **Drone CI** or even as part of your **IaC provisionning**.
 
-<!--TODO improve CI + CD support description-->
-
 ## How to use
 
 <div align="center">
@@ -46,7 +44,7 @@ jobs:
     runs-on: 'ubuntu-latest'
     steps:
       - name: 'Setup CTFd'
-        uses: 'ctfer-io/ctfd-setup@v0'
+        uses: 'ctfer-io/ctfd-setup@v1.1.0'
         with:
           url: ${{ secrets.CTFD_URL }}
           appearance_name: 'My CTF'
@@ -76,7 +74,7 @@ steps:
   # ...
 
   - name: 'Setup CTFd'
-    image: 'ctferio/ctfd-setup@v0'
+    image: 'ctferio/ctfd-setup@v1.1.0'
     settings:
       url:
         from_secret: CTFD_URL
