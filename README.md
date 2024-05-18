@@ -48,8 +48,8 @@ jobs:
         uses: 'ctfer-io/ctfd-setup@v0'
         with:
           url: ${{ secrets.CTFD_URL }}
-          global_name: 'My CTF'
-          global_description: 'My CTF description'
+          appearance_name: 'My CTF'
+          appearance_description: 'My CTF description'
           admin_name: ${{ secrets.ADMIN_USERNAME }}
           admin_email: ${{ secrets.ADMIN_EMAIL }}
           admin_password: ${{ secrets.ADMIN_PASSWORD }}
@@ -79,8 +79,8 @@ steps:
     settings:
       url:
         from_secret: CTFD_URL
-      global_name: 'My CTF'
-      global_description: 'My CTF description'
+      appearance_name: 'My CTF'
+      appearance_description: 'My CTF description'
       admin_name:
         from_secret: ADMIN_USERNAME
       admin_email:

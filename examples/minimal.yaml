@@ -1,4 +1,4 @@
-global:
+appearance:
   name: 'MyCTF 20XX'
   description: 'MyCTF description'
 
