@@ -52,7 +52,12 @@ jobs:
           fi
 
       - name: Setup CTFd
-        run: go run cmd/ctfd-setup/main.go
+        run: |
+          go build -cover -o ctfd-setup cmd/ctfd-setup/main.go
+          mkdir coverdir
+          GOCOVERDIR=coverdir ./ctfd-setup
+          go tool covdata textfmt -i=coverdir -o cov.out
+          sed -i '/^\//d' cov.out
         env:
           URL: http://localhost:8000
           APPEARANCE_NAME: 'CTFer.io'
@@ -60,6 +65,11 @@ jobs:
           ADMIN_NAME: 'ctfer'
           ADMIN_EMAIL: 'ctfer-io@protonmail.com'
           ADMIN_PASSWORD: 'ctfer'
+
+      - name: Upload coverage to Coveralls
+        uses: shogo82148/actions-goveralls@785c9d68212c91196d3994652647f8721918ba11 # v1.9.0
+        with:
+          path-to-profile: cov.out
 
   go-lint:
     runs-on: ubuntu-latest
