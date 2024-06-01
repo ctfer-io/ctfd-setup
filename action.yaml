@@ -8,7 +8,6 @@ branding:
 inputs:
   file:
     description: 'Configuration file to use for setting up CTFd. If let empty, will default the values and look for secrets in expected environment variables. For more info, refers to the documentation.'
-    default: '.ctfd.yaml'
   url:
     description: 'URL to reach the CTFd instance.'
     required: true
