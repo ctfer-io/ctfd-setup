@@ -86,12 +86,12 @@ func updateSetup(ctx context.Context, client *api.Client, conf *Config) error {
 			},
 		}, api.WithContext(ctx))
 		if err != nil {
-			return err
+			return errors.Wrap(err, "pushing theme logo")
 		}
 		if _, err := client.PatchConfigsCTFLogo(&api.PatchConfigsCTFLogo{
 			Value: &lf[0].Location,
 		}, api.WithContext(ctx)); err != nil {
-			return err
+			return errors.Wrap(err, "patching CTF logo")
 		}
 	}
 
@@ -103,12 +103,12 @@ func updateSetup(ctx context.Context, client *api.Client, conf *Config) error {
 			},
 		}, api.WithContext(ctx))
 		if err != nil {
-			return err
+			return errors.Wrap(err, "pushing theme small icon")
 		}
 		if _, err := client.PatchConfigsCTFSmallIcon(&api.PatchConfigsCTFLogo{
 			Value: &smf[0].Location,
 		}, api.WithContext(ctx)); err != nil {
-			return err
+			return errors.Wrap(err, "patching CTF small icon")
 		}
 	}
 

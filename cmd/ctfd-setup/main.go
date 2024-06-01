@@ -574,21 +574,19 @@ func run(ctx *cli.Context) error {
 	}
 
 	// Read and unmarshal setup config file if any
-	if ctx.IsSet("file") && ctx.String("file") != "" {
-		f := ctx.String("file")
-		log.Info("getting configuration file", zap.String("file", f))
-		if _, err := os.Stat(f); err == nil {
-			fd, err := os.Open(f)
-			if err != nil {
-				return errors.Wrapf(err, "opening file %s", f)
-			}
-			defer fd.Close()
+	if f := ctx.String("file"); f != "" {
+		log.Info("loading configuration file", zap.String("file", f))
 
-			dec := yaml.NewDecoder(fd)
-			dec.KnownFields(true)
-			if err := dec.Decode(&conf); err != nil {
-				return errors.Wrap(err, "unmarshalling configuration")
-			}
+		fd, err := os.Open(f)
+		if err != nil {
+			return errors.Wrapf(err, "opening file %s", f)
+		}
+		defer fd.Close()
+
+		dec := yaml.NewDecoder(fd)
+		dec.KnownFields(true)
+		if err := dec.Decode(&conf); err != nil {
+			return errors.Wrap(err, "unmarshalling configuration")
 		}
 	}
 
