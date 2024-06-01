@@ -578,7 +578,7 @@ func run(ctx *cli.Context) error {
 
 		fd, err := os.Open(f)
 		if err != nil {
-			return errors.Wrapf(err, "opening file %s", f)
+			return errors.Wrapf(err, "opening configuration file %s", f)
 		}
 		defer fd.Close()
 
@@ -610,13 +610,13 @@ func intPtr(ctx *cli.Context, key string) *int {
 }
 
 func filePtr(ctx *cli.Context, key string) (*ctfdsetup.File, error) {
-	if !ctx.IsSet(key) {
+	fp := ctx.String(key)
+	if fp == "" {
 		return &ctfdsetup.File{}, nil
 	}
-	fp := ctx.String(key)
 	content, err := os.ReadFile(fp)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrapf(err, "failed to open file %s", fp)
 	}
 	return &ctfdsetup.File{
 		Name:    filepath.Base(fp),
