@@ -25,6 +25,7 @@ inputs:
     description: 'The frontend small icon. Provide a path to a locally-accessible file.'
   theme_name:
     description: 'The frontend theme name.'
+    default: 'core'
   theme_color:
     description: 'The frontend theme color.'
   theme_header:
@@ -38,6 +39,7 @@ inputs:
     description: 'The domain whitelist (a list separated by colons) to allow users to have email addresses from.'
   accounts_verify_emails:
     description: 'Whether to verify emails once a user register or not.'
+    default: 'false'
   accounts_team_creation:
     description: 'Whether to allow team creation by players or not.'
   accounts_team_size:
@@ -63,12 +65,16 @@ inputs:
   # Settings
   settings_challenge_visibility:
     description: 'The visibility for the challenges. Please refer to CTFd documentation (https://docs.ctfd.io/docs/settings/visibility-settings/).'
+    default: 'public'
   settings_account_visibility:
     description: 'The visibility for the accounts. Please refer to CTFd documentation (https://docs.ctfd.io/docs/settings/visibility-settings/).'
+    default: 'public'
   settings_score_visibility:
     description: 'The visibility for the scoreboard. Please refer to CTFd documentation (https://docs.ctfd.io/docs/settings/visibility-settings/).'
+    default: 'public'
   settings_registration_visibility:
     description: 'The visibility for the registration. Please refer to CTFd documentation (https://docs.ctfd.io/docs/settings/visibility-settings/).'
+    default: 'public'
   settings_paused:
     description: 'Whether the CTFd is paused or not.'
   # Security
@@ -135,6 +141,7 @@ inputs:
   # UserMode
   mode:
     description: 'The mode of your CTFd, either users or teams.'
+    default: 'users'
   # Admin
   admin_name:
     description: 'The administrator name.'
@@ -145,7 +152,7 @@ inputs:
 
 runs:
   using: 'docker'
-  image: 'docker://ctferio/ctfd-setup:v1.1.8'
+  image: 'docker://ctferio/ctfd-setup:v1.1.9'
   env:
     FILE: ${{ inputs.file }}
     URL: ${{ inputs.url }}
