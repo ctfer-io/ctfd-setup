@@ -445,6 +445,7 @@ func main() {
 
 	if err := app.RunContext(ctx, os.Args); err != nil {
 		ctfdsetup.Log().Error("fatal error", zap.Error(err))
+		os.Exit(1)
 	}
 }
 
@@ -573,7 +574,7 @@ func run(ctx *cli.Context) error {
 	}
 
 	// Read and unmarshal setup config file if any
-	if ctx.IsSet("file") {
+	if ctx.IsSet("file") && ctx.String("file") != "" {
 		f := ctx.String("file")
 		log.Info("getting configuration file", zap.String("file", f))
 		if _, err := os.Stat(f); err == nil {
