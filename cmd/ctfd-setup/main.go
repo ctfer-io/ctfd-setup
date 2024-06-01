@@ -35,7 +35,6 @@ func main() {
 			cli.HelpFlag,
 			&cli.StringFlag{
 				Name:     "file",
-				Value:    ".ctfd.yaml",
 				Usage:    "Configuration file to use for setting up CTFd. If let empty, will default the values and look for secrets in expected environment variables. For more info, refers to the documentation.",
 				EnvVars:  []string{"FILE", "PLUGIN_FILE"},
 				Category: management,
