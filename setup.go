@@ -62,6 +62,7 @@ func bareSetup(ctx context.Context, client *api.Client, conf *Config) error {
 		CTFName:                conf.Appearance.Name,
 		CTFDescription:         conf.Appearance.Description,
 		UserMode:               conf.Mode,
+		CTFTheme:               conf.Theme.Name,
 		ChallengeVisibility:    conf.Settings.ChallengeVisibility,
 		AccountVisibility:      conf.Settings.AccountVisibility,
 		ScoreVisibility:        conf.Settings.ScoreVisibility,
