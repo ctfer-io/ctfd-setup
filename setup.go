@@ -117,6 +117,7 @@ func updateSetup(ctx context.Context, client *api.Client, conf *Config) error {
 	params := &api.PatchConfigsParams{
 		CTFDescription:                     &conf.Appearance.Description,
 		CTFName:                            &conf.Appearance.Name,
+		DefaultLocale:                      conf.Appearance.DefaultLocale,
 		CTFTheme:                           &conf.Theme.Name,
 		ThemeFooter:                        ptr(string(conf.Theme.Footer.Content)),
 		ThemeHeader:                        ptr(string(conf.Theme.Header.Content)),
