@@ -66,6 +66,12 @@ func main() {
 				EnvVars:  []string{"APPEARANCE_DESCRIPTION", "PLUGIN_APPEARANCE_DESCRIPTION"},
 				Category: configuration,
 			},
+			&cli.StringFlag{
+				Name:     "appearance.default_locale",
+				Usage:    "The default language for the users.",
+				EnvVars:  []string{"APPEARANCE_DEFAULT_LOCALE", "PLUGIN_APPEARANCE_DEFAULT_LOCALE"},
+				Category: configuration,
+			},
 			// => Theme
 			&cli.StringFlag{
 				Name:     "theme.logo",
@@ -477,8 +483,9 @@ func run(ctx *cli.Context) error {
 	}
 	conf := &ctfdsetup.Config{
 		Appearance: ctfdsetup.Appearance{
-			Name:        ctx.String("appearance.name"),
-			Description: ctx.String("appearance.description"),
+			Name:          ctx.String("appearance.name"),
+			Description:   ctx.String("appearance.description"),
+			DefaultLocale: stringPtr(ctx, "appearance.default_locale"),
 		},
 		Theme: ctfdsetup.Theme{
 			Logo:      logo,

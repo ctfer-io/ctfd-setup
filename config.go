@@ -27,8 +27,9 @@ type (
 	}
 
 	Appearance struct {
-		Name        string `yaml:"name"`        // required
-		Description string `yaml:"description"` // required
+		Name          string  `yaml:"name"`        // required
+		Description   string  `yaml:"description"` // required
+		DefaultLocale *string `yaml:"default_locale"`
 	}
 
 	Theme struct {
