@@ -88,7 +88,7 @@ func main() {
 			&cli.StringFlag{
 				Name:     "theme.name",
 				Usage:    "The frontend theme name.",
-				Value:    "core",
+				Value:    "core-beta",
 				EnvVars:  []string{"THEME_NAME", "PLUGIN_THEME_NAME"},
 				Category: configuration,
 			},
