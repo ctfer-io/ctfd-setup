@@ -25,7 +25,7 @@ inputs:
     description: 'The frontend small icon. Provide a path to a locally-accessible file.'
   theme_name:
     description: 'The frontend theme name.'
-    default: 'core'
+    default: 'core-beta'
   theme_color:
     description: 'The frontend theme color.'
   theme_header:
