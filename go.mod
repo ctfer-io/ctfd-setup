@@ -3,7 +3,7 @@ module github.com/ctfer-io/ctfd-setup
 go 1.22.2
 
 require (
-	github.com/ctfer-io/go-ctfd v0.9.0
+	github.com/ctfer-io/go-ctfd v0.10.0
 	github.com/pkg/errors v0.9.1
 	github.com/urfave/cli/v2 v2.27.5
 	go.uber.org/multierr v1.11.0
