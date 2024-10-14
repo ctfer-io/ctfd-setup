@@ -1,7 +1,7 @@
 github.com/cpuguy83/go-md2man/v2 v2.0.5 h1:ZtcqGrnekaHpVLArFSe4HK5DoKx1T0rq2DwVB0alcyc=
 github.com/cpuguy83/go-md2man/v2 v2.0.5/go.mod h1:tgQtvFlXSQOSOSIRvRPT7W67SCa46tRHOmNcaadrF8o=
-github.com/ctfer-io/go-ctfd v0.9.0 h1:udhuLkUgQ0hWBbE8Qzo4hZWVdUtEocp1t7xRIwDFqs4=
-github.com/ctfer-io/go-ctfd v0.9.0/go.mod h1:jNeeXui6iW1jsAfa4D5v6MaK0UF26CtjTRtCqS/PWH4=
+github.com/ctfer-io/go-ctfd v0.10.0 h1:+lBLqde9XNdLB+TzXvJg9I9qkLRA8rYmf9bpjQ2CAUg=
+github.com/ctfer-io/go-ctfd v0.10.0/go.mod h1:jNeeXui6iW1jsAfa4D5v6MaK0UF26CtjTRtCqS/PWH4=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/gorilla/schema v1.4.1 h1:jUg5hUjCSDZpNGLuXQOgIWGdlgrIdYvgQ0wZtdK1M3E=
