@@ -6,7 +6,8 @@
   <a href="https://coveralls.io/github/ctfer-io/ctfd-setup?branch=main"><img src="https://img.shields.io/coverallsCoverage/github/ctfer-io/ctfd-setup?style=for-the-badge" alt="Coverage Status"></a>
 	<br>
 	<a href="https://github.com/ctfer-io/ctfd-setup/actions/workflows/codeql-analysis.yaml"><img src="https://img.shields.io/github/actions/workflow/status/ctfer-io/ctfd-setup/codeql-analysis.yaml?style=for-the-badge&label=CodeQL" alt="CodeQL"></a>
-    <a href="https://securityscorecards.dev/viewer/?uri=github.com/ctfer-io/ctfd-setup"><img src="https://img.shields.io/ossf-scorecard/github.com/ctfer-io/ctfd-setup?label=openssf%20scorecard&style=for-the-badge" alt="OpenSSF Scoreboard"></a>
+  <a href="https://securityscorecards.dev/viewer/?uri=github.com/ctfer-io/ctfd-setup"><img src="https://img.shields.io/ossf-scorecard/github.com/ctfer-io/ctfd-setup?label=openssf%20scorecard&style=for-the-badge" alt="OpenSSF Scoreboard"></a>
+  <img src="https://img.shields.io/badge/slsa-level%203-green?style=for-the-badge" alt="SLSA Level 3">
 </div>
 
 CTFd does not have the concept of **configuration file**, leading to **deployment complications** and the **impossibility to version configurations**.
@@ -17,14 +18,37 @@ Moreover, the setup API does not exist, so we had to map it to what the frontend
 To fit those gaps, we built `ctfd-setup` on top of the CTFd API. This utility helps setup a CTFd instance from a YAML configuration file, CLI flags and environment variables.
 Thanks to this, you can integrate it using **GitHub Actions**, **Drone CI** or even as part of your **IaC provisionning**.
 
+With `ctfd-setup` you can **setup your CTFd in a second**.
+
 ## How to use
 
 <div align="center">
     <img src="res/how-to-use.excalidraw.png" alt="ctfd-setup utility used in GitHub Actions, Drone CI and Docker and Kubernetes initial container" width="800px">
 </div>
 
-For the CLI configuration, please refer to the binary's specific API through `ctfd-setup --help`.
-In use of IaC provisionning scenario, the corresponding environment variables are also mapped to the output, so please refer to it.
+### YAML
+
+You can use `ctfd-setup` as a CLI tool and provision it a YAML configuration file.
+
+```yaml
+appearance:
+  name: 'My CTF'
+  description: 'My CTF description'
+
+admin:
+  name: 'admin'
+  email: 'admin@super.ctf'
+  password: 'admin_password'
+
+mode: users
+```
+
+**We encourage you to version this file** such that re-deployment is easy (e.g., for test purposes, or in case of a catastrophic failure of the infra during the event).
+Nevertheless, please do not commit the admin credentials ! Use the corresponding environment variables and provide their value from a safe secret store.
+
+For further configuration, please refer to the binary's specific API through `ctfd-setup --help`.
+
+If you are using it as part of Infra as Code provisionning, you can map the values of this configuration file to environment variables (which could ease your job).
 
 ### GitHub Actions
 
