@@ -44,7 +44,7 @@ jobs:
     runs-on: 'ubuntu-latest'
     steps:
       - name: 'Setup CTFd'
-        uses: 'ctfer-io/ctfd-setup@v1.4.0'
+        uses: 'ctfer-io/ctfd-setup@v1.4.2'
         with:
           url: ${{ secrets.CTFD_URL }}
           appearance_name: 'My CTF'
@@ -74,7 +74,7 @@ steps:
   # ...
 
   - name: 'Setup CTFd'
-    image: 'ctferio/ctfd-setup@v1.4.0'
+    image: 'ctferio/ctfd-setup@v1.4.2'
     settings:
       url:
         from_secret: CTFD_URL
