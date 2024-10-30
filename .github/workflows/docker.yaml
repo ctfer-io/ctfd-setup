@@ -55,7 +55,7 @@ jobs:
           build-args: |
             VERSION=${{ steps.infos.outputs.version }}
             COMMIT=${{ github.sha }}
-            COMMIT_DATE=${{ steps.infos.outputs.date }}
+            DATE=${{ steps.infos.outputs.date }}
 
   # This step calls the container workflow to generate provenance and push it to
   # the container registry.

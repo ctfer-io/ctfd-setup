@@ -15,9 +15,10 @@ import (
 )
 
 var (
-	Version    = "dev"
-	Commit     = ""
-	CommitDate = ""
+	version = "dev"
+	commit  = ""
+	date    = ""
+	builtBy = ""
 )
 
 const (
@@ -434,11 +435,12 @@ func main() {
 				Email: "lucastesson@protonmail.com",
 			},
 		},
-		Version: Version,
+		Version: version,
 		Metadata: map[string]any{
-			"version": Version,
-			"commit":  Commit,
-			"date":    CommitDate,
+			"version": version,
+			"commit":  commit,
+			"date":    date,
+			"builtBy": builtBy,
 		},
 	}
 
