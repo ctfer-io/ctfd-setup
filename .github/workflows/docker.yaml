@@ -31,6 +31,18 @@ jobs:
         uses: docker/metadata-action@8e5442c4ef9f78752691e2d8f8d19755c6f78e81 # v5.5.1
         with:
           images: ctferio/ctfd-setup
+      
+      - name: Git commit date
+        id: infos
+        run: |
+          # trim version prefix
+          version=${{ github.ref_name }}
+          version="${version#"v"}"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+
+          # output date per RFC 3339
+          date="$(git log -1 --format=%cd --date=format:%Y-%m-%dT%H:%M:%SZ)"
+          echo "date=$date" >> "$GITHUB_OUTPUT"
 
       - name: Build and push Docker image
         uses: docker/build-push-action@4f58ea79222b3b9dc2c8bbdd6debcef730109a75 # v6.9.0
@@ -40,6 +52,14 @@ jobs:
           sbom: true # may not produce SBOM in manifest if the image has no filesystem (e.g. "FROM scratch")
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+          build-args: |
+            VERSION=$VERSION
+            COMMIT=$COMMIT
+            COMMIT_DATE=$COMMIT_DATE
+        env:
+          VERSION: ${{ steps.infos.outputs.version }}
+          COMMIT: ${{ github.sha }}
+          COMMIT_DATE: ${{ steps.infos.outputs.date }}
 
   # This step calls the container workflow to generate provenance and push it to
   # the container registry.

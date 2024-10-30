@@ -18,7 +18,6 @@ var (
 	Version    = "dev"
 	Commit     = ""
 	CommitDate = ""
-	TreeState  = ""
 )
 
 const (
@@ -437,10 +436,9 @@ func main() {
 		},
 		Version: Version,
 		Metadata: map[string]any{
-			"version":   Version,
-			"commit":    Commit,
-			"date":      CommitDate,
-			"treeState": TreeState,
+			"version": Version,
+			"commit":  Commit,
+			"date":    CommitDate,
 		},
 	}
 

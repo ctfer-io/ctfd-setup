@@ -7,7 +7,13 @@ RUN go mod download
 COPY . .
 
 ENV CGO_ENABLED=0
-RUN go build -cover -o /go/bin/ctfd-setup cmd/ctfd-setup/main.go
+ARG VERSION="dev"
+ARG COMMIT
+ARG COMMIT_DATE
+RUN go build -cover \
+    -ldflags="-s -w -X 'main.Version="$VERSION"' -X 'main.Commit="$COMMIT"' -X 'main.CommitDate="$COMMIT_DATE"'" \
+    -o /go/bin/ctfd-setup \
+    cmd/ctfd-setup/main.go
 
 
 

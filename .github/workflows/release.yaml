@@ -37,7 +37,6 @@ jobs:
           args: release --clean
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          VERSION_LDFLAGS: ${{ steps.ldflags.outputs.version }}
 
       - name: Generate subject
         id: hash
