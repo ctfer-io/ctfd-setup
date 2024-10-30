@@ -53,13 +53,9 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           build-args: |
-            VERSION=$VERSION
-            COMMIT=$COMMIT
-            COMMIT_DATE=$COMMIT_DATE
-        env:
-          VERSION: ${{ steps.infos.outputs.version }}
-          COMMIT: ${{ github.sha }}
-          COMMIT_DATE: ${{ steps.infos.outputs.date }}
+            VERSION=${{ steps.infos.outputs.version }}
+            COMMIT=${{ github.sha }}
+            COMMIT_DATE=${{ steps.infos.outputs.date }}
 
   # This step calls the container workflow to generate provenance and push it to
   # the container registry.
