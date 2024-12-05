@@ -33,6 +33,10 @@ jobs:
           key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
           restore-keys: ${{ runner.os }}-go-
 
+      - name: Run unit tests
+        run: |
+          go test ./ -run=^Test_U -coverprofile=unit.out -json | tee -a gotest.json
+
       - name: Wait for CTFd server
         run: |
           max_attempts=60
@@ -51,13 +55,19 @@ jobs:
             exit 1
           fi
 
-      - name: Setup CTFd
+      - name: Run functional tests
+        run: |
+          go test ./ -run=^Test_F -coverprofile=functional.out -json | tee -a gotest.json
+        env:
+          URL: http://localhost:8000
+
+      - name: Run integration test
         run: |
           go build -cover -o ctfd-setup cmd/ctfd-setup/main.go
           mkdir coverdir
           GOCOVERDIR=coverdir ./ctfd-setup
-          go tool covdata textfmt -i=coverdir -o cov.out
-          sed -i '/^\//d' cov.out
+          go tool covdata textfmt -i=coverdir -o integration.out
+          sed -i '/^\//d' integration.out
         env:
           URL: http://localhost:8000
           APPEARANCE_NAME: 'CTFer.io'
@@ -65,6 +75,11 @@ jobs:
           ADMIN_NAME: 'ctfer'
           ADMIN_EMAIL: 'ctfer-io@protonmail.com'
           ADMIN_PASSWORD: 'ctfer'
+
+      - name: Merge coverage data
+        run: |
+          go install go.shabbyrobe.org/gocovmerge/cmd/gocovmerge@fa4f82cfbf4d57c646c1ed0f35002bf1b89fbf7a
+          gocovmerge unit.out functional.out integration.out > cov.out
 
       - name: Upload coverage to Coveralls
         uses: shogo82148/actions-goveralls@785c9d68212c91196d3994652647f8721918ba11 # v1.9.0
