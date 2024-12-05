@@ -3,12 +3,13 @@ package ctfdsetup
 import (
 	"os"
 
+	"github.com/invopop/jsonschema"
 	"gopkg.in/yaml.v3"
 )
 
 type File struct {
-	Name    string
-	Content []byte
+	Name    string `yaml:"-" json:"-" jsonschema:"-"`
+	Content []byte `yaml:"-" json:"-" jsonschema:"-"`
 }
 
 var _ yaml.Unmarshaler = (*File)(nil)
@@ -16,6 +17,7 @@ var _ yaml.Unmarshaler = (*File)(nil)
 func (file *File) UnmarshalYAML(node *yaml.Node) error {
 	if node.Value != "" {
 		file.Content = []byte(node.Value)
+		return nil
 	}
 	type lfi struct {
 		FromFile *string `yaml:"from_file"`
@@ -35,4 +37,23 @@ func (file *File) UnmarshalYAML(node *yaml.Node) error {
 	}
 	file.Content = fc
 	return nil
+}
+
+func (file File) JSONSchema() *jsonschema.Schema {
+	subObj := jsonschema.NewProperties()
+	subObj.Set("from_file", &jsonschema.Schema{
+		Type:        "string",
+		Description: "The file to import content from.",
+	})
+
+	return &jsonschema.Schema{
+		OneOf: []*jsonschema.Schema{
+			{
+				Type:       "object",
+				Properties: subObj,
+			}, {
+				Type: "string",
+			},
+		},
+	}
 }

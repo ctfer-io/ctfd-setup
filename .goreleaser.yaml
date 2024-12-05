@@ -1,6 +1,7 @@
 before:
   hooks:
     - go mod tidy
+    - go run cmd/ctfd-setup/main.go schema # build schema.json file
 
 gomod:
   proxy: true
@@ -32,3 +33,7 @@ checksum: {}
 
 sboms:
   - artifacts: source
+
+release:
+  extra_files:
+    - glob: schema.json

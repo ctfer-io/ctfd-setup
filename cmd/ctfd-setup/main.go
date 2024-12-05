@@ -42,7 +42,6 @@ func main() {
 			&cli.StringFlag{
 				Name:     "url",
 				Usage:    "URL to reach the CTFd instance.",
-				Required: true,
 				EnvVars:  []string{"URL", "PLUGIN_URL"},
 				Category: management,
 			},
@@ -428,6 +427,28 @@ func main() {
 				Category: configuration,
 			},
 		},
+		Commands: []*cli.Command{
+			{
+				Name:  "schema",
+				Usage: "Generate the JSON schema of a .ctfd.yaml file.",
+				Flags: []cli.Flag{
+					&cli.StringFlag{
+						Name:    "output",
+						Aliases: []string{"o"},
+						Usage:   "The output file name.",
+						Value:   "schema.json",
+					},
+				},
+				Action: func(ctx *cli.Context) error {
+					o := ctx.String("output")
+					schema, err := ctfdsetup.Config{}.Schema()
+					if err != nil {
+						return err
+					}
+					return os.WriteFile(o, schema, os.ModeAppend|os.ModePerm)
+				},
+			},
+		},
 		Action: run,
 		Authors: []*cli.Author{
 			{
@@ -487,7 +508,7 @@ func run(ctx *cli.Context) error {
 			Description:   ctx.String("appearance.description"),
 			DefaultLocale: stringPtr(ctx, "appearance.default_locale"),
 		},
-		Theme: ctfdsetup.Theme{
+		Theme: &ctfdsetup.Theme{
 			Logo:      logo,
 			SmallIcon: smallIcon,
 			Name:      ctx.String("theme.name"),
@@ -496,7 +517,7 @@ func run(ctx *cli.Context) error {
 			Footer:    footer,
 			Settings:  settings,
 		},
-		Accounts: ctfdsetup.Accounts{
+		Accounts: &ctfdsetup.Accounts{
 			DomainWhitelist:               stringPtr(ctx, "accounts.domain_whitelist"),
 			VerifyEmails:                  ctx.Bool("accounts.verify_emails"),
 			TeamCreation:                  boolPtr(ctx, "accounts.team_creation"),
@@ -507,25 +528,25 @@ func run(ctx *cli.Context) error {
 			IncorrectSubmissionsPerMinute: intPtr(ctx, "accounts.incorrect_submissions_per_minute"),
 			NameChanges:                   boolPtr(ctx, "accounts.name_changes"),
 		},
-		Pages: ctfdsetup.Pages{
+		Pages: &ctfdsetup.Pages{
 			RobotsTxt: robotsTxt,
 		},
-		MajorLeagueCyber: ctfdsetup.MajorLeagueCyber{
+		MajorLeagueCyber: &ctfdsetup.MajorLeagueCyber{
 			ClientID:     stringPtr(ctx, "major_league_cyber.client_id"),
 			ClientSecret: stringPtr(ctx, "major_league_cyber.client_secret"),
 		},
-		Settings: ctfdsetup.Settings{
+		Settings: &ctfdsetup.Settings{
 			ChallengeVisibility:    ctx.String("settings.challenge_visibility"),
 			AccountVisibility:      ctx.String("settings.account_visibility"),
 			ScoreVisibility:        ctx.String("settings.score_visibility"),
 			RegistrationVisibility: ctx.String("settings.registration_visibility"),
 			Paused:                 boolPtr(ctx, "settings.paused"),
 		},
-		Security: ctfdsetup.Security{
+		Security: &ctfdsetup.Security{
 			HTMLSanitization: boolPtr(ctx, "security.html_sanitization"),
 			RegistrationCode: stringPtr(ctx, "security.registration_code"),
 		},
-		Email: ctfdsetup.Email{
+		Email: &ctfdsetup.Email{
 			Registration: ctfdsetup.EmailContent{
 				Subject: stringPtr(ctx, "email.registration.subject"),
 				Body:    stringPtr(ctx, "email.registration.body"),
@@ -552,16 +573,16 @@ func run(ctx *cli.Context) error {
 			Username: stringPtr(ctx, "email.username"),
 			Password: stringPtr(ctx, "email.password"),
 		},
-		Time: ctfdsetup.Time{
+		Time: &ctfdsetup.Time{
 			Start:     stringPtr(ctx, "time.start"),
 			End:       stringPtr(ctx, "time.end"),
 			Freeze:    stringPtr(ctx, "time.freeze"),
 			ViewAfter: boolPtr(ctx, "time.view_after"),
 		},
-		Social: ctfdsetup.Social{
+		Social: &ctfdsetup.Social{
 			Shares: boolPtr(ctx, "social.shares"),
 		},
-		Legal: ctfdsetup.Legal{
+		Legal: &ctfdsetup.Legal{
 			TOS: ctfdsetup.ExternalReference{
 				URL:     stringPtr(ctx, "legal.tos.url"),
 				Content: stringPtr(ctx, "legal.tos.content"),
@@ -573,9 +594,11 @@ func run(ctx *cli.Context) error {
 		},
 		Mode: ctx.String("mode"),
 		Admin: ctfdsetup.Admin{
-			Name:     ctx.String("admin.name"),
-			Email:    ctx.String("admin.email"),
-			Password: ctx.String("admin.password"),
+			Name:  ctx.String("admin.name"),
+			Email: ctx.String("admin.email"),
+			Password: ctfdsetup.FromEnv{
+				Content: ctx.String("admin.password"),
+			},
 		},
 	}
 
@@ -601,6 +624,9 @@ func run(ctx *cli.Context) error {
 	}
 
 	// Connect to CTFd
+	if !ctx.IsSet("url") {
+		return errors.New("url flag not set, is required")
+	}
 	return ctfdsetup.Setup(ctx.Context, ctx.String("url"), ctx.String("api_key"), conf)
 }
 

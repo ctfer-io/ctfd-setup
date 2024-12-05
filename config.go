@@ -1,163 +1,275 @@
 package ctfdsetup
 
 import (
-	"fmt"
+	"encoding/json"
 
+	"github.com/invopop/jsonschema"
+	"github.com/pkg/errors"
+	"github.com/xeipuuv/gojsonschema"
 	"go.uber.org/multierr"
 )
 
 type (
 	Config struct {
-		Appearance Appearance `yaml:"appearance"`
-		Theme      Theme      `yaml:"theme"`
-		Accounts   Accounts   `yaml:"accounts"`
-		Pages      Pages      `yaml:"pages"`
 		// Don't handle brackets here, should not be part of those settings but CRUD objects
 		// CustomFields are not handled as they are not predictable and would be hard to handle + bad practice (API changes on the fly)
-		MajorLeagueCyber MajorLeagueCyber `yaml:"major_league_cyber"`
-		Settings         Settings         `yaml:"settings"`
-		Security         Security         `yaml:"security"`
-		Email            Email            `yaml:"email"`
-		Time             Time             `yaml:"time"`
-		Social           Social           `yaml:"social"`
-		Legal            Legal            `yaml:"legal"`
-		Mode             string           `yaml:"mode"`
 
-		Admin Admin `yaml:"admin"`
+		Appearance       Appearance        `yaml:"appearance"                   json:"appearance"                   jsonschema:"required"`
+		Theme            *Theme            `yaml:"theme,omitempty"              json:"theme,omitempty"`
+		Accounts         *Accounts         `yaml:"accounts,omitempty"           json:"accounts,omitempty"`
+		Pages            *Pages            `yaml:"pages,omitempty"              json:"pages,omitempty"`
+		MajorLeagueCyber *MajorLeagueCyber `yaml:"major_league_cyber,omitempty" json:"major_league_cyber,omitempty"`
+		Settings         *Settings         `yaml:"settings,omitempty"           json:"settings,omitempty"`
+		Security         *Security         `yaml:"security,omitempty"           json:"security,omitempty"`
+		Email            *Email            `yaml:"email,omitempty"              json:"email,omitempty"`
+		Time             *Time             `yaml:"time,omitempty"               json:"time,omitempty"`
+		Social           *Social           `yaml:"social,omitempty"             json:"social,omitempty"`
+		Legal            *Legal            `yaml:"legal,omitempty"              json:"legal,omitempty"`
+		Admin            Admin             `yaml:"admin"                        json:"admin"                        jsonschema:"required"`
+
+		// The mode of your CTFd, either users or teams.
+		Mode string `yaml:"mode,omitempty" json:"mode,omitempty" jsonschema:"enum=users,enum=teams,default=users"`
 	}
 
+	// Appearance of the CTFd.
 	Appearance struct {
-		Name          string  `yaml:"name"`        // required
-		Description   string  `yaml:"description"` // required
-		DefaultLocale *string `yaml:"default_locale"`
+		// The name of your CTF, displayed as is.
+		Name string `yaml:"name" json:"name" jsonschema:"required"`
+
+		// The description of your CTF, displayed as is.
+		Description string `yaml:"description" json:"description" jsonschema:"required"`
+
+		// The default language for the users.
+		DefaultLocale *string `yaml:"default_locale,omitempty" json:"default_locale,omitempty"`
 	}
 
+	// Theme displayed to end-users.
 	Theme struct {
-		Logo      *File  `yaml:"logo"`
-		SmallIcon *File  `yaml:"small_icon"`
-		Name      string `yaml:"name"`
-		Color     string `yaml:"color"`
 		// Banner is only supported by bare setup, need to be at least support by PatchConfigs
-		Header   *File `yaml:"header"`
-		Footer   *File `yaml:"footer"`
-		Settings *File `yaml:"settings"`
+
+		// The frontend logo.
+		Logo *File `yaml:"logo,omitempty" json:"logo,omitempty"`
+
+		// The frontend small icon.
+		SmallIcon *File `yaml:"small_icon,omitempty" json:"small_icon,omitempty"`
+
+		// The frontend theme name.
+		Name string `yaml:"name,omitempty" json:"name,omitempty"`
+
+		// The frontend theme color.
+		Color string `yaml:"color,omitempty" json:"color,omitempty"`
+
+		// The frontend header.
+		Header *File `yaml:"header,omitempty" json:"header,omitempty"`
+
+		// The frontend footer.
+		Footer *File `yaml:"footer,omitempty" json:"footer,omitempty"`
+
+		// The frontend settings (JSON).
+		Settings *File `yaml:"settings,omitempty" json:"settings,omitempty"`
 	}
 
+	// Accounts parameters, like rate limiting or default permissions.
 	Accounts struct {
-		DomainWhitelist               *string `yaml:"domain_whitelist"`
-		VerifyEmails                  bool    `yaml:"verify_emails"`
-		TeamCreation                  *bool   `yaml:"team_creation"`
-		TeamSize                      *int    `yaml:"team_size"`
-		NumTeams                      *int    `yaml:"num_teams"`
-		NumUsers                      *int    `yaml:"num_users"`
-		TeamDisbanding                *string `yaml:"team_disbanding"`
-		IncorrectSubmissionsPerMinute *int    `yaml:"incorrect_submissions_per_minutes"`
-		NameChanges                   *bool   `yaml:"name_changes"`
+		// The domain whitelist (a list separated by colons) to allow users to have email addresses from.
+		DomainWhitelist *string `yaml:"domain_whitelist,omitempty" json:"domain_whitelist,omitempty"`
+
+		// Whether to verify emails once a user register or not.
+		VerifyEmails bool `yaml:"verify_emails,omitempty" json:"verify_emails,omitempty"`
+
+		// Whether to allow team creation by players or not.
+		TeamCreation *bool `yaml:"team_creation,omitempty" json:"team_creation,omitempty"`
+
+		// Maximum size (number of players) in a team.
+		TeamSize *int `yaml:"team_size,omitempty" json:"team_size,omitempty"`
+
+		// The total number of teams allowed.
+		NumTeams *int `yaml:"num_teams,omitempty" json:"num_teams,omitempty"`
+
+		// The total number of users allowed.
+		NumUsers *int `yaml:"num_users,omitempty" json:"num_users,omitempty"`
+
+		// Whether to allow teams to be disbanded or not. Could be inactive_only or disabled.
+		TeamDisbanding *string `yaml:"team_disbanding,omitempty" json:"team_disbanding,omitempty"`
+
+		// Maximum number of invalid submissions per minute (per user/team). We suggest you use it as part of an anti-brute-force strategy (rate limiting).
+		IncorrectSubmissionsPerMinute *int `yaml:"incorrect_submissions_per_minutes,omitempty" json:"incorrect_submissions_per_minutes,omitempty"`
+
+		// Whether a user can change its name or not.
+		NameChanges *bool `yaml:"name_changes,omitempty" json:"name_changes,omitempty"`
 	}
 
+	// Pages global configuration.
 	Pages struct {
-		RobotsTxt *File `yaml:"robots_txt"`
+		// Define the /robots.txt file content, for web crawlers indexing.
+		RobotsTxt *File `yaml:"robots_txt,omitempty" json:"robots_txt,omitempty"`
 	}
 
+	// MajorLeagueCyber credentials to register the CTF.
 	MajorLeagueCyber struct {
-		ClientID     *string `yaml:"client_id"`
-		ClientSecret *string `yaml:"client_secret"`
+		// The MajorLeagueCyber OAuth ClientID.
+		ClientID *string `yaml:"client_id,omitempty" json:"client_id,omitempty"`
+
+		// The MajorLeagueCyber OAuth Client Secret.
+		ClientSecret *string `yaml:"client_secret,omitempty" json:"client_secret,omitempty"`
 	}
 
+	// Settings for ressources visibility.
 	Settings struct {
-		ChallengeVisibility    string `yaml:"challenge_visibility"`
-		AccountVisibility      string `yaml:"account_visibility"`
-		ScoreVisibility        string `yaml:"score_visibility"`
-		RegistrationVisibility string `yaml:"registration_visibility"`
-		Paused                 *bool  `yaml:"paused"`
+		// The visibility for the challenges. Please refer to CTFd documentation (https://docs.ctfd.io/docs/settings/visibility-settings/).
+		ChallengeVisibility string `yaml:"challenge_visibility,omitempty" json:"challenge_visibility,omitempty"`
+
+		// The visibility for the accounts. Please refer to CTFd documentation (https://docs.ctfd.io/docs/settings/visibility-settings/).
+		AccountVisibility string `yaml:"account_visibility,omitempty" json:"account_visibility,omitempty"`
+
+		// The visibility for the scoreboard. Please refer to CTFd documentation (https://docs.ctfd.io/docs/settings/visibility-settings/).
+		ScoreVisibility string `yaml:"score_visibility,omitempty" json:"score_visibility,omitempty"`
+
+		// The visibility for the registration. Please refer to CTFd documentation (https://docs.ctfd.io/docs/settings/visibility-settings/).
+		RegistrationVisibility string `yaml:"registration_visibility,omitempty" json:"registration_visibility,omitempty"`
+
+		// Whether the CTFd is paused or not.
+		Paused *bool `yaml:"paused,omitempty" json:"paused,omitempty"`
 	}
 
+	// Security of contents and accesses.
 	Security struct {
-		HTMLSanitization *bool   `yaml:"html_sanitization"`
-		RegistrationCode *string `yaml:"registration_code"`
+		// Whether to turn on HTML sanitization or not.
+		HTMLSanitization *bool `yaml:"html_sanitization,omitempty" json:"html_sanitization,omitempty"`
+
+		// The registration code (secret) to join the CTF.
+		RegistrationCode *string `yaml:"registration_code,omitempty" json:"registration_code,omitempty"`
 	}
 
+	// Email rules and server credentials.
 	Email struct {
-		Registration              EmailContent `yaml:"registration"`
-		Confirmation              EmailContent `yaml:"confirmation"`
-		NewAccount                EmailContent `yaml:"new_account"`
-		PasswordReset             EmailContent `yaml:"password_reset"`
-		PasswordResetConfirmation EmailContent `yaml:"password_reset_confirmation"`
-		From                      *string      `yaml:"from"`
-		Server                    *string      `yaml:"server"`
-		Port                      *string      `yaml:"port"`
-		Username                  *string      `yaml:"username"`
-		Password                  *string      `yaml:"password"`
-		TLS_SSL                   *bool        `yaml:"tls_ssl"`
-		STARTTLS                  *bool        `yaml:"starttls"`
+		// The registration email.
+		Registration EmailContent `yaml:"registration,omitempty" json:"registration,omitempty"`
+
+		// The confirmation email.
+		Confirmation EmailContent `yaml:"confirmation,omitempty" json:"confirmation,omitempty"`
+
+		// The new account email.
+		NewAccount EmailContent `yaml:"new_account,omitempty" json:"new_account,omitempty"`
+
+		// The password reset email.
+		PasswordReset EmailContent `yaml:"password_reset,omitempty" json:"password_reset,omitempty"`
+
+		// The password reset confirmation email.
+		PasswordResetConfirmation EmailContent `yaml:"password_reset_confirmation,omitempty" json:"password_reset_confirmation,omitempty"`
+
+		// The 'From:' to sent to mail with.
+		From *string `yaml:"from,omitempty" json:"from,omitempty"`
+
+		// The mail server to use.
+		Server *string `yaml:"server,omitempty" json:"server,omitempty"`
+
+		// The mail server port to reach.
+		Port *string `yaml:"port,omitempty" json:"port,omitempty"`
+
+		// The username to log in to the mail server.
+		Username *string `yaml:"username,omitempty" json:"username,omitempty"`
+
+		// The password to log in to the mail server.
+		Password *string `yaml:"password,omitempty" json:"password,omitempty"`
+
+		// Whether to turn on TLS/SSL or not.
+		TLS_SSL *bool `yaml:"tls_ssl,omitempty" json:"tls_ssl,omitempty"`
+
+		// Whether to turn on STARTTLS or not.
+		STARTTLS *bool `yaml:"starttls,omitempty" json:"starttls,omitempty"`
 	}
 
 	EmailContent struct {
-		Subject *string `yaml:"subject"`
-		Body    *string `yaml:"body"`
+		// Subject of the email.
+		Subject *string `yaml:"subject,omitempty" json:"subject,omitempty"`
+
+		// Body (or content) or the email.
+		Body *string `yaml:"body,omitempty"    json:"body,omitempty"`
 	}
 
+	// Time settings of the CTF.
 	Time struct {
-		Start     *string `yaml:"start"`
-		End       *string `yaml:"end"`
-		Freeze    *string `yaml:"freeze"`
-		ViewAfter *bool   `yaml:"view_after"`
+		// The start timestamp at which the CTFd will open.
+		Start *string `yaml:"start,omitempty" json:"start,omitempty"`
+
+		// The end timestamp at which the CTFd will close.
+		End *string `yaml:"end,omitempty" json:"end,omitempty"`
+
+		// The freeze timestamp at which the CTFd will remain open but won't accept any further submissions.
+		Freeze *string `yaml:"freeze,omitempty" json:"freeze,omitempty"`
+
+		// Whether allows users to view challenges after end or not.
+		ViewAfter *bool `yaml:"view_after,omitempty" json:"view_after,omitempty"`
 	}
 
+	// Social network configuration.
 	Social struct {
-		Shares *bool `yaml:"shares"`
+		// Whether to enable users share they solved a challenge or not.
+		Shares *bool `yaml:"shares,omitempty" json:"shares,omitempty"`
 	}
 
+	// Legal contents for players.
 	Legal struct {
-		TOS           ExternalReference `yaml:"tos"`
-		PrivacyPolicy ExternalReference `yaml:"privacy_policy"`
+		// The Terms of Services.
+		TOS ExternalReference `yaml:"tos,omitempty" json:"tos,omitempty"`
+
+		// The Privacy Policy.
+		PrivacyPolicy ExternalReference `yaml:"privacy_policy,omitempty" json:"privacy_policy,omitempty"`
 	}
 
 	ExternalReference struct {
-		URL     *string `yaml:"url"`
-		Content *string `yaml:"content"`
+		// The URL to access the content.
+		URL *string `yaml:"url,omitempty" json:"url,omitempty"`
+
+		// The content of the reference.
+		Content *string `yaml:"content,omitempty" json:"content,omitempty"`
 	}
 
+	// Admin accesses.
 	Admin struct {
-		Name     string `yaml:"name"`     // required
-		Email    string `yaml:"email"`    // required
-		Password string `yaml:"password"` // required
+		// The administrator name. Immutable, or need the administrator to change the CTFd data AND the configuration file.
+		Name string `yaml:"name,omitempty" json:"name,omitempty" jsonschema:"required"`
+
+		// The administrator email address. Immutable, or need the administrator to change the CTFd data AND the configuration file.
+		Email string `yaml:"email,omitempty" json:"email,omitempty" jsonschema:"required"`
+
+		// The administrator password, recommended to use the varenvs. Immutable, or need the administrator to change the CTFd data AND the configuration file.
+		Password FromEnv `yaml:"password,omitempty" json:"password,omitempty" jsonschema:"required"`
 	}
 )
 
+// Schema returns the JSON schema for the configuration file.
+func (conf Config) Schema() ([]byte, error) {
+	reflector := jsonschema.Reflector{}
+	if err := reflector.AddGoComments("github.com/ctfer-io/ctfd-setup", "./"); err != nil {
+		return nil, err
+	}
+	r := reflector.Reflect(&Config{})
+	return json.MarshalIndent(r, "", "  ")
+}
+
+// Validate the configuration content.
 func (conf Config) Validate() error {
-	var merr error
-	if conf.Appearance.Name == "" {
-		merr = multierr.Append(merr, &ErrRequired{Attribute: "appearance.name"})
+	// Build schema loader
+	schema, err := conf.Schema()
+	if err != nil {
+		return errors.Wrap(err, "schema validation failed due to schema generation")
 	}
-	if conf.Appearance.Description == "" {
-		merr = multierr.Append(merr, &ErrRequired{Attribute: "appearance.description"})
+	loader := gojsonschema.NewBytesLoader(schema)
+
+	// Load and validate configuration
+	confLoader := gojsonschema.NewGoLoader(conf)
+	res, err := gojsonschema.Validate(loader, confLoader)
+	if err != nil {
+		return err
 	}
-	if conf.Admin.Name == "" {
-		merr = multierr.Append(merr, &ErrRequired{Attribute: "admin.name"})
-	}
-	if conf.Admin.Email == "" {
-		merr = multierr.Append(merr, &ErrRequired{Attribute: "admin.email"})
-	}
-	if conf.Admin.Password == "" {
-		merr = multierr.Append(merr, &ErrRequired{Attribute: "admin.password"})
-	}
-	if merr != nil {
+	if !res.Valid() {
+		var merr error
+		for _, err := range res.Errors() {
+			merr = multierr.Append(merr, errors.New(err.String()))
+		}
 		return merr
 	}
-
-	// Does not validate attributes content, let CTFd deal with
-	// that and provide a meaningful error message... if it can :)
-
 	return nil
-}
-
-type ErrRequired struct {
-	Attribute string
-}
-
-var _ error = (*ErrRequired)(nil)
-
-func (err ErrRequired) Error() string {
-	return fmt.Sprintf("Required attribute %s was either not set or left to empty value", err.Attribute)
 }
