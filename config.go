@@ -54,7 +54,7 @@ type (
 		SmallIcon *File `yaml:"small_icon,omitempty" json:"small_icon,omitempty"`
 
 		// The frontend theme name.
-		Name string `yaml:"name,omitempty" json:"name,omitempty"`
+		Name string `yaml:"name,omitempty" json:"name,omitempty" jsonschema:"default=core-beta"` // do not restrict to core-beta or core (deprecated) to avoid limiting to official themes
 
 		// The frontend theme color.
 		Color string `yaml:"color,omitempty" json:"color,omitempty"`
@@ -117,16 +117,16 @@ type (
 	// Settings for ressources visibility.
 	Settings struct {
 		// The visibility for the challenges. Please refer to CTFd documentation (https://docs.ctfd.io/docs/settings/visibility-settings/).
-		ChallengeVisibility string `yaml:"challenge_visibility,omitempty" json:"challenge_visibility,omitempty"`
+		ChallengeVisibility string `yaml:"challenge_visibility,omitempty" json:"challenge_visibility,omitempty" jsonschema:"enum=public,enum=private,enum=admins,default=private"`
 
 		// The visibility for the accounts. Please refer to CTFd documentation (https://docs.ctfd.io/docs/settings/visibility-settings/).
-		AccountVisibility string `yaml:"account_visibility,omitempty" json:"account_visibility,omitempty"`
+		AccountVisibility string `yaml:"account_visibility,omitempty" json:"account_visibility,omitempty" jsonschema:"enum=public,enum=private,enum=admins,default=public"`
 
 		// The visibility for the scoreboard. Please refer to CTFd documentation (https://docs.ctfd.io/docs/settings/visibility-settings/).
-		ScoreVisibility string `yaml:"score_visibility,omitempty" json:"score_visibility,omitempty"`
+		ScoreVisibility string `yaml:"score_visibility,omitempty" json:"score_visibility,omitempty" jsonschema:"enum=public,enum=private,enum=admins,default=public"`
 
 		// The visibility for the registration. Please refer to CTFd documentation (https://docs.ctfd.io/docs/settings/visibility-settings/).
-		RegistrationVisibility string `yaml:"registration_visibility,omitempty" json:"registration_visibility,omitempty"`
+		RegistrationVisibility string `yaml:"registration_visibility,omitempty" json:"registration_visibility,omitempty" jsonschema:"enum=public,enum=private,enum=admins,default=public"`
 
 		// Whether the CTFd is paused or not.
 		Paused *bool `yaml:"paused,omitempty" json:"paused,omitempty"`
@@ -238,6 +238,36 @@ type (
 		Password FromEnv `yaml:"password,omitempty" json:"password,omitempty" jsonschema:"required"`
 	}
 )
+
+func NewConfig() *Config {
+	return &Config{
+		Theme: &Theme{
+			Name:      "core-beta",
+			Logo:      &File{},
+			SmallIcon: &File{},
+			Header:    &File{},
+			Footer:    &File{},
+			Settings:  &File{},
+		},
+		Accounts: &Accounts{},
+		Pages: &Pages{
+			RobotsTxt: &File{},
+		},
+		MajorLeagueCyber: &MajorLeagueCyber{},
+		Settings: &Settings{
+			ChallengeVisibility:    "private", // default value
+			AccountVisibility:      "public",  // default value
+			ScoreVisibility:        "public",  // default value
+			RegistrationVisibility: "public",  // default value
+		},
+		Security: &Security{},
+		Email:    &Email{},
+		Time:     &Time{},
+		Social:   &Social{},
+		Legal:    &Legal{},
+		Mode:     "users", // default value
+	}
+}
 
 // Schema returns the JSON schema for the configuration file.
 func (conf Config) Schema() ([]byte, error) {
