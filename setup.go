@@ -31,7 +31,7 @@ func Setup(ctx context.Context, url string, apiKey string, conf *Config) error {
 	} else if apiKey == "" {
 		if err := client.Login(&api.LoginParams{
 			Name:     conf.Admin.Name,
-			Password: conf.Admin.Password,
+			Password: conf.Admin.Password.Content,
 		}, api.WithContext(ctx)); err != nil {
 			return &ErrClient{err: err}
 		}
@@ -71,7 +71,7 @@ func bareSetup(ctx context.Context, client *api.Client, conf *Config) error {
 		TeamSize:               conf.Accounts.TeamSize,
 		Name:                   conf.Admin.Name,
 		Email:                  conf.Admin.Email,
-		Password:               conf.Admin.Password,
+		Password:               conf.Admin.Password.Content,
 	}, api.WithContext(ctx)); err != nil {
 		return &ErrClient{err: err}
 	}
