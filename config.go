@@ -223,7 +223,7 @@ type (
 		URL *string `yaml:"url,omitempty" json:"url,omitempty"`
 
 		// The content of the reference.
-		Content *string `yaml:"content,omitempty" json:"content,omitempty"`
+		Content *File `yaml:"content,omitempty" json:"content,omitempty"`
 	}
 
 	// Admin accesses.
@@ -264,8 +264,15 @@ func NewConfig() *Config {
 		Email:    &Email{},
 		Time:     &Time{},
 		Social:   &Social{},
-		Legal:    &Legal{},
-		Mode:     "users", // default value
+		Legal: &Legal{
+			TOS: ExternalReference{
+				Content: &File{},
+			},
+			PrivacyPolicy: ExternalReference{
+				Content: &File{},
+			},
+		},
+		Mode: "users", // default value
 	}
 }
 
