@@ -167,9 +167,9 @@ func updateSetup(ctx context.Context, client *api.Client, conf *Config) error {
 		ViewAfterCTF:                       conf.Time.ViewAfter,
 		SocialShares:                       conf.Social.Shares,
 		PrivacyURL:                         conf.Legal.PrivacyPolicy.URL,
-		PrivacyText:                        conf.Legal.PrivacyPolicy.Content,
+		PrivacyText:                        ptr(string(conf.Legal.PrivacyPolicy.Content.Content)),
 		TOSURL:                             conf.Legal.TOS.URL,
-		TOSText:                            conf.Legal.TOS.Content,
+		TOSText:                            ptr(string(conf.Legal.TOS.Content.Content)),
 		UserMode:                           &conf.Mode,
 	}
 

@@ -1,0 +1,32 @@
+appearance:
+  name: "NoBracketsCTF 2024 - Finale"
+  description: ""
+
+theme:
+  logo:
+    from_file: logo.png
+  small_icon:
+    from_file: tab-icon.png
+  name: core
+  header:
+    from_file: theme-header.html
+
+settings:
+  challenge_visibility: public
+  account_visibility: public
+  score_visibility: private
+  registration_visibility: public
+
+# Don't set time, not very usefull in replicability
+
+legal:
+  tos:
+    content:
+      from_file: tos.md
+
+mode: teams
+
+admin:
+  name: 'my-name'
+  email: 'my-email@dns.tld'
+  password: 'dont put password in a config file, use the varenv'

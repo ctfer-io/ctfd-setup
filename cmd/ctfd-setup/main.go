@@ -174,7 +174,7 @@ func main() {
 			// => Pages
 			&cli.StringFlag{
 				Name:     "pages.robots_txt",
-				Usage:    "Define the /robots.txt file content, for web crawlers indexing.",
+				Usage:    "Define the /robots.txt file content, for web crawlers indexing. Provide a path to a locally-accessible file.",
 				EnvVars:  []string{"PAGES_ROBOTS_TXT", "PLUGIN_PAGES_ROBOTS_TXT"},
 				Category: configuration,
 			},
@@ -502,6 +502,14 @@ func run(ctx *cli.Context) error {
 	if err != nil {
 		return err
 	}
+	tos, err := filePtr(ctx, "legal.tos.content")
+	if err != nil {
+		return err
+	}
+	privpol, err := filePtr(ctx, "legal.privacy_policy.content")
+	if err != nil {
+		return err
+	}
 	conf := &ctfdsetup.Config{
 		Appearance: ctfdsetup.Appearance{
 			Name:          ctx.String("appearance.name"),
@@ -585,11 +593,11 @@ func run(ctx *cli.Context) error {
 		Legal: &ctfdsetup.Legal{
 			TOS: ctfdsetup.ExternalReference{
 				URL:     stringPtr(ctx, "legal.tos.url"),
-				Content: stringPtr(ctx, "legal.tos.content"),
+				Content: tos,
 			},
 			PrivacyPolicy: ctfdsetup.ExternalReference{
 				URL:     stringPtr(ctx, "legal.privacy_policy.url"),
-				Content: stringPtr(ctx, "legal.privacy_policy.content"),
+				Content: privpol,
 			},
 		},
 		Mode: ctx.String("mode"),
