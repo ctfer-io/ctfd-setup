@@ -35,6 +35,7 @@ func (file *File) UnmarshalYAML(node *yaml.Node) error {
 	if err != nil {
 		return err
 	}
+	file.Name = *lfiv.FromFile
 	file.Content = fc
 	return nil
 }
