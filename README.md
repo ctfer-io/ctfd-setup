@@ -44,11 +44,9 @@ mode: users
 ```
 
 **We encourage you to version this file** such that re-deployment is easy (e.g., for test purposes, or in case of a catastrophic failure of the infra during the event).
-Nevertheless, please do not commit the admin credentials ! Use the corresponding environment variables and provide their value from a safe secret store.
+Nevertheless, please do not commit the admin credentials ! Use `from_env` objects instead (refer to [the YAML Schema](#schema) for more info).
 
 For further configuration, please refer to the binary's specific API through `ctfd-setup --help`.
-
-If you are using it as part of Infra as Code provisionning, you can map the values of this configuration file to environment variables (which could ease your job).
 
 ### GitHub Actions
 
@@ -71,6 +69,8 @@ jobs:
         uses: 'ctfer-io/ctfd-setup@v1.4.4'
         with:
           url: ${{ secrets.CTFD_URL }}
+          file: '.ctfd.yaml'
+          # or directly attributes
           appearance_name: 'My CTF'
           appearance_description: 'My CTF description'
           admin_name: ${{ secrets.ADMIN_USERNAME }}
@@ -102,6 +102,8 @@ steps:
     settings:
       url:
         from_secret: CTFD_URL
+      file: '.ctfd.yaml'
+      # or directly attributes
       appearance_name: 'My CTF'
       appearance_description: 'My CTF description'
       admin_name:
@@ -112,6 +114,16 @@ steps:
         from_secret: ADMIN_PASSWORD
       # ... and so on (non-mandatory attributes)
 ```
+
+## Schema
+
+For ease of use, you can generate and use the `ctfd-setup` YAML schema using `ctfd-setup schema`.
+
+In your `.ctfd.yaml` file you could then prepend `# yaml-language-server: $schema=file:///path/to/schema.json`.
+
+<div align="center">
+  <img src="res/schema.png">
+</div>
 
 ## Security
 
