@@ -183,6 +183,14 @@ func updateSetup(ctx context.Context, client *api.Client, conf *Config) error {
 	if err := client.PatchConfigs(params, api.WithContext(ctx)); err != nil {
 		return &ErrClient{err: err}
 	}
+
+	// Handle additional pages configuration
+	if conf.Pages != nil && len(conf.Pages.Additional) != 0 {
+		if err := additionalPages(ctx, client, conf.Pages.Additional); err != nil {
+			return err
+		}
+	}
+
 	return nil
 }
 
