@@ -103,6 +103,32 @@ type (
 	Pages struct {
 		// Define the /robots.txt file content, for web crawlers indexing.
 		RobotsTxt *File `yaml:"robots_txt,omitempty" json:"robots_txt,omitempty"`
+
+		Additional []Page `yaml:"additional,omitempty" json:"additional,omitempty"`
+	}
+
+	// Page to configure and display on the CTFd.
+	Page struct {
+		// Title of the page.
+		Title string `yaml:"title" json:"title"`
+
+		// Route to serve.
+		Route string `yaml:"route" json:"route"`
+
+		// Format to consume the content.
+		Format string `yaml:"format,omitempty" json:"format,omitempty" jsonschema:"enum=markdown,enum=html,default=markdown"`
+
+		// The page content. If you need to use images, please use an external CDN to make sure the content is replicable.
+		Content *File `yaml:"content" json:"content"`
+
+		// Set the page as a draft.
+		Draft bool `yaml:"draft,omitempty" json:"draft,omitempty" jsonschema:"default=false"`
+
+		// Hide or show the page to users.
+		Hidden bool `yaml:"hidden,omitempty" json:"hidden,omitempty" jsonschema:"default=false"`
+
+		// Configure whether the page require authentication or not.
+		AuthRequired bool `yaml:"auth_required,omitempty" json:"auth_required,omitempty" jsonschema:"default=false"`
 	}
 
 	// MajorLeagueCyber credentials to register the CTF.

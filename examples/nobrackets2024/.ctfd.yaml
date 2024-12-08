@@ -30,3 +30,11 @@ admin:
   name: 'my-name'
   email: 'my-email@dns.tld'
   password: 'dont put password in a config file, use the varenv'
+
+pages:
+  additional:
+    - title: CTFer.io example index
+      route: index
+      format: markdown
+      content:
+        from_file: examples/nobrackets2024/index.html
