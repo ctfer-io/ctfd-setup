@@ -46,6 +46,23 @@ mode: users
 **We encourage you to version this file** such that re-deployment is easy (e.g., for test purposes, or in case of a catastrophic failure of the infra during the event).
 Nevertheless, please do not commit the admin credentials ! Use `from_env` objects instead (refer to [the YAML Schema](#schema) for more info).
 
+It could also deploy custom pages (like the index) as follows.
+This feature is not available in CLI, [GitHub Actions](#github-actions) and [Drone CI](#drone-ci).
+
+```yaml
+# ... other configuration attributes
+
+pages:
+  additional:
+    - title: CTFer.io example index
+      route: index
+      format: markdown
+      content: |
+        <div>
+          <p>Some index page content</p>
+        </div>
+```
+
 For further configuration, please refer to the binary's specific API through `ctfd-setup --help`.
 
 ### GitHub Actions
