@@ -305,9 +305,7 @@ func NewConfig() *Config {
 // Schema returns the JSON schema for the configuration file.
 func (conf Config) Schema() ([]byte, error) {
 	reflector := jsonschema.Reflector{}
-	if err := reflector.AddGoComments("github.com/ctfer-io/ctfd-setup", "./"); err != nil {
-		return nil, err
-	}
+	_ = reflector.AddGoComments("github.com/ctfer-io/ctfd-setup", "./") // this could fail once binary is compiled, thus ignored (no problem)
 	r := reflector.Reflect(&Config{})
 	return json.MarshalIndent(r, "", "  ")
 }
