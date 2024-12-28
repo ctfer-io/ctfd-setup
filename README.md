@@ -134,13 +134,16 @@ steps:
 
 ## Schema
 
-For ease of use, you can generate and use the `ctfd-setup` YAML schema using `ctfd-setup schema`.
+For ease of use, you can generate and use the YAML schema using `ctfd-setup schema`.
 
-In your `.ctfd.yaml` file you could then prepend `# yaml-language-server: $schema=file:///path/to/schema.json`.
+**(Optional)** In your `.ctfd.yaml` file you could then prepend `# yaml-language-server: $schema=file:///path/to/schema.json`.
 
 <div align="center">
   <img src="res/schema.png">
 </div>
+
+> [!NOTE]
+> This will appear by default if your IDE has a YAML extension with support of the [JSON SchemaStore](https://www.schemastore.org/json/).
 
 ## Security
 
