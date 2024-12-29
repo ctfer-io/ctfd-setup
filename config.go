@@ -140,7 +140,7 @@ type (
 		ClientSecret *string `yaml:"client_secret,omitempty" json:"client_secret,omitempty"`
 	}
 
-	// Settings for ressources visibility.
+	// Settings for resources visibility.
 	Settings struct {
 		// The visibility for the challenges. Please refer to CTFd documentation (https://docs.ctfd.io/docs/settings/visibility-settings/).
 		ChallengeVisibility string `yaml:"challenge_visibility,omitempty" json:"challenge_visibility,omitempty" jsonschema:"enum=public,enum=private,enum=admins,default=private"`
