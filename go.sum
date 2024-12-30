@@ -4,8 +4,8 @@ github.com/buger/jsonparser v1.1.1 h1:2PnMjfWD7wBILjqQbt530v576A/cAbQvEW9gGIpYMU
 github.com/buger/jsonparser v1.1.1/go.mod h1:6RYKKt7H4d4+iWqouImQ9R2FZql3VbhNgx27UK13J/0=
 github.com/cpuguy83/go-md2man/v2 v2.0.5 h1:ZtcqGrnekaHpVLArFSe4HK5DoKx1T0rq2DwVB0alcyc=
 github.com/cpuguy83/go-md2man/v2 v2.0.5/go.mod h1:tgQtvFlXSQOSOSIRvRPT7W67SCa46tRHOmNcaadrF8o=
-github.com/ctfer-io/go-ctfd v0.10.1 h1:Bxr6/qo/h1c0FYFNZv/ej839Hzo5x1VMs0v+Io8ovs8=
-github.com/ctfer-io/go-ctfd v0.10.1/go.mod h1:ebgSW8LdP/qtRCpglK4djBp+g6kU5YM98XBZKowiCeY=
+github.com/ctfer-io/go-ctfd v0.10.2 h1:DpQSaxcHN7ugC72xlpEl0HIUbusOSolPkWD8Ki7vc7U=
+github.com/ctfer-io/go-ctfd v0.10.2/go.mod h1:ebgSW8LdP/qtRCpglK4djBp+g6kU5YM98XBZKowiCeY=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
