@@ -4,7 +4,7 @@ go 1.22.2
 
 require (
 	github.com/ctfer-io/go-ctfd v0.10.2
-	github.com/invopop/jsonschema v0.12.0
+	github.com/invopop/jsonschema v0.13.0
 	github.com/pkg/errors v0.9.1
 	github.com/stretchr/testify v1.10.0
 	github.com/urfave/cli/v2 v2.27.5
