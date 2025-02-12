@@ -83,7 +83,7 @@ jobs:
     runs-on: 'ubuntu-latest'
     steps:
       - name: 'Setup CTFd'
-        uses: 'ctfer-io/ctfd-setup@v1.5.2'
+        uses: 'ctfer-io/ctfd-setup@v1.6.0'
         with:
           url: ${{ secrets.CTFD_URL }}
           file: '.ctfd.yaml'
@@ -115,7 +115,7 @@ steps:
   # ...
 
   - name: 'Setup CTFd'
-    image: 'ctferio/ctfd-setup@v1.5.2'
+    image: 'ctferio/ctfd-setup@v1.6.0'
     settings:
       url:
         from_secret: CTFD_URL
