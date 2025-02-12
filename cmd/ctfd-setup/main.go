@@ -40,6 +40,13 @@ func main() {
 				Category: management,
 			},
 			&cli.StringFlag{
+				Name:        "dir",
+				Usage:       "The directory to parse from.",
+				EnvVars:     []string{"DIRECTORY"},
+				Category:    management,
+				Destination: &ctfdsetup.Directory,
+			},
+			&cli.StringFlag{
 				Name:     "url",
 				Usage:    "URL to reach the CTFd instance.",
 				EnvVars:  []string{"URL", "PLUGIN_URL"},
