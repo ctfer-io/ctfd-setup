@@ -2,9 +2,14 @@ package ctfdsetup
 
 import (
 	"os"
+	"path/filepath"
 
 	"github.com/invopop/jsonschema"
 	"gopkg.in/yaml.v3"
+)
+
+var (
+	Directory string
 )
 
 type File struct {
@@ -31,7 +36,7 @@ func (file *File) UnmarshalYAML(node *yaml.Node) error {
 		return nil
 	}
 
-	fc, err := os.ReadFile(*lfiv.FromFile)
+	fc, err := os.ReadFile(filepath.Join(Directory, *lfiv.FromFile))
 	if err != nil {
 		return err
 	}
