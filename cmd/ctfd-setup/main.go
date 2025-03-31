@@ -625,7 +625,9 @@ func run(ctx *cli.Context) error {
 		if err != nil {
 			return errors.Wrapf(err, "opening configuration file %s", f)
 		}
-		defer fd.Close()
+		defer func() {
+			_ = fd.Close()
+		}()
 
 		dec := yaml.NewDecoder(fd)
 		dec.KnownFields(true)
