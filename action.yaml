@@ -39,6 +39,8 @@ inputs:
   # Accounts
   accounts_domain_whitelist:
     description: 'The domain whitelist (a list separated by colons) to allow users to have email addresses from.'
+  accounts_domain_blacklist:
+    description: 'The domain blacklist (a list separated by colons) to block users to have email addresses from.'
   accounts_verify_emails:
     description: 'Whether to verify emails once a user register or not.'
     default: 'false'
@@ -169,6 +171,7 @@ runs:
     THEME_FOOTER: ${{ inputs.theme_footer }}
     THEME_SETTINGS: ${{ inputs.theme_settings }}
     ACCOUNTS_DOMAIN_WHITELIST: ${{ inputs.accounts_domain_whitelist }}
+    ACCOUNTS_DOMAIN_BLACKLIST: ${{ inputs.accounts_domain_blacklist }}
     ACCOUNTS_VERIFY_EMAILS: ${{ inputs.accounts_verify_emails }}
     ACCOUNTS_TEAM_CREATION: ${{ inputs.accounts_team_creation }}
     ACCOUNTS_TEAM_SIZE: ${{ inputs.accounts_team_size }}

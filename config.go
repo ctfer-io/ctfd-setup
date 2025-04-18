@@ -74,6 +74,9 @@ type (
 		// The domain whitelist (a list separated by colons) to allow users to have email addresses from.
 		DomainWhitelist *string `yaml:"domain_whitelist,omitempty" json:"domain_whitelist,omitempty"`
 
+		// The domain blacklist (a list separated by colons) to blocks users to have email addresses from.
+		DomainBlacklist *string `yaml:"domain_blacklist,omitempty" json:"domain_blacklist,omitempty"`
+
 		// Whether to verify emails once a user register or not.
 		VerifyEmails bool `yaml:"verify_emails,omitempty" json:"verify_emails,omitempty"`
 
