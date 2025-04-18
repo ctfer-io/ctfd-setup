@@ -94,6 +94,10 @@ func updateSetup(ctx context.Context, client *api.Client, conf *Config) error {
 		}, api.WithContext(ctx)); err != nil {
 			return errors.Wrap(err, "patching CTF logo")
 		}
+	} else {
+		if _, err := client.PatchConfigsCTFLogo(&api.PatchConfigsCTFLogo{}, api.WithContext(ctx)); err != nil {
+			return err
+		}
 	}
 
 	// Push small icon
@@ -110,6 +114,10 @@ func updateSetup(ctx context.Context, client *api.Client, conf *Config) error {
 			Value: &smf[0].Location,
 		}, api.WithContext(ctx)); err != nil {
 			return errors.Wrap(err, "patching CTF small icon")
+		}
+	} else {
+		if _, err := client.PatchConfigsCTFSmallIcon(&api.PatchConfigsCTFLogo{}, api.WithContext(ctx)); err != nil {
+			return err
 		}
 	}
 
