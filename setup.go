@@ -95,6 +95,7 @@ func updateSetup(ctx context.Context, client *api.Client, conf *Config) error {
 			return errors.Wrap(err, "patching CTF logo")
 		}
 	}
+	// TODO else delete logo
 
 	// Push small icon
 	if conf.Theme.SmallIcon.Name != "" {
@@ -112,6 +113,7 @@ func updateSetup(ctx context.Context, client *api.Client, conf *Config) error {
 			return errors.Wrap(err, "patching CTF small icon")
 		}
 	}
+	// TODO else delete small icon
 
 	// Update configs attributes
 	params := &api.PatchConfigsParams{
@@ -123,6 +125,7 @@ func updateSetup(ctx context.Context, client *api.Client, conf *Config) error {
 		ThemeHeader:                        ptr(string(conf.Theme.Header.Content)),
 		ThemeSettings:                      ptr(string(conf.Theme.Settings.Content)),
 		DomainWhitelist:                    conf.Accounts.DomainWhitelist,
+		DomainBlacklist:                    conf.Accounts.DomainBlacklist,
 		IncorrectSubmissionsPerMin:         conf.Accounts.IncorrectSubmissionsPerMinute,
 		NameChanges:                        conf.Accounts.NameChanges,
 		NumTeams:                           conf.Accounts.NumTeams,

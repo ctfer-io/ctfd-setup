@@ -129,6 +129,12 @@ func main() {
 				EnvVars:  []string{"ACCOUNTS_DOMAIN_WHITELIST", "PLUGIN_ACCOUNTS_DOMAIN_WHITELIST"},
 				Category: configuration,
 			},
+			&cli.StringFlag{
+				Name:     "accounts.domain_blacklist",
+				Usage:    "The domain blacklist (a list separated by colons) to block users to have email addresses from.",
+				EnvVars:  []string{"ACCOUNTS_DOMAIN_BLACKLIST", "PLUGIN_ACCOUNTS_DOMAIN_BLACKLIST"},
+				Category: configuration,
+			},
 			&cli.BoolFlag{
 				Name:     "accounts.verify_emails",
 				Usage:    "Whether to verify emails once a user register or not.",
@@ -534,6 +540,7 @@ func run(ctx *cli.Context) error {
 		},
 		Accounts: &ctfdsetup.Accounts{
 			DomainWhitelist:               stringPtr(ctx, "accounts.domain_whitelist"),
+			DomainBlacklist:               stringPtr(ctx, "accounts.domain_blacklist"),
 			VerifyEmails:                  ctx.Bool("accounts.verify_emails"),
 			TeamCreation:                  boolPtr(ctx, "accounts.team_creation"),
 			TeamSize:                      intPtr(ctx, "accounts.team_size"),
