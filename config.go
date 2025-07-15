@@ -96,7 +96,7 @@ type (
 		TeamDisbanding *string `yaml:"team_disbanding,omitempty" json:"team_disbanding,omitempty"`
 
 		// Maximum number of invalid submissions per minute (per user/team). We suggest you use it as part of an anti-brute-force strategy (rate limiting).
-		IncorrectSubmissionsPerMinute *int `yaml:"incorrect_submissions_per_minutes,omitempty" json:"incorrect_submissions_per_minutes,omitempty"`
+		IncorrectSubmissionsPerMinute *int `yaml:"incorrect_submissions_per_minute,omitempty" json:"incorrect_submissions_per_minute,omitempty"`
 
 		// Whether a user can change its name or not.
 		NameChanges *bool `yaml:"name_changes,omitempty" json:"name_changes,omitempty"`
