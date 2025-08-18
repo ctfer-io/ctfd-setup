@@ -3,6 +3,6 @@ appearance:
   description: 'MyCTF description'
 
 admin:
-  name: 'my-name'
-  email: 'my-email@dns.tld'
-  password: 'dont put password in a config file, use the varenv'
+  name: 'ctfer'
+  email: 'ctfer@ctfer.io'
+  password: 'ctfer'

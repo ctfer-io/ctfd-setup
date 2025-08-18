@@ -7,7 +7,7 @@ theme:
     from_file: logo.png
   small_icon:
     from_file: tab-icon.png
-  name: core
+  name: core-beta
   header:
     from_file: theme-header.html
 
@@ -16,6 +16,11 @@ settings:
   account_visibility: public
   score_visibility: private
   registration_visibility: public
+
+accounts:
+  # Team creation was set to false in production as teams where created ahead of the event,
+  # thanks to a qualification round.
+  team_creation: true
 
 # Don't set time, not very usefull in replicability
 
@@ -27,9 +32,9 @@ legal:
 mode: teams
 
 admin:
-  name: 'my-name'
-  email: 'my-email@dns.tld'
-  password: 'dont put password in a config file, use the varenv'
+  name: 'ctfer'
+  email: 'ctfer@ctfer.io'
+  password: 'ctfer'
 
 pages:
   additional:
