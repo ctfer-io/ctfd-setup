@@ -1,98 +1,80 @@
 <style id="theme-color">
-    .tag-Introduction > button{border: 5px solid #cad3f5; border-radius: 5px;}
-    .tag-Facile > button{border: 5px solid #a6da95; border-radius: 5px;}
-    .tag-Moyen > button{border: 5px solid #eed49f; border-radius: 5px;}
-    .tag-Difficile > button{border: 5px solid #ed8796; border-radius: 5px;}
-    .tag-D\u00e9mon > button{border: 5px solid #c6a0f6; border-radius: 5px;}
-    
-    button > p::before{white-space: pre;}
-      
-    .solved-challenge {
-        background-color: #a6da95 !important;
-        opacity: 100;
-        border-radius: 0px;
+  /* Logos on the main page */
+  [data-bs-theme="light"] .theme-dark {
+    display: none !important;
+  }
+
+  [data-bs-theme="light"] .theme-light {
+    display: block !important;
+  }
+
+  [data-bs-theme="dark"] .theme-dark {
+    display: block !important;
+  }
+
+  [data-bs-theme="dark"] .theme-light {
+    display: none !important;
+  }
+
+  /* Button on the main page */
+  h1 .btn {
+    padding: 20px !important;
+    /* Invert background and color to highlight */
+    color: var(--bs-body-bg);
+    background-color: var(--bs-btn-color) !important;
+    border-radius: 5px !important;
+    font-size: 20px !important;
+
+    &:hover {
+      background-color: #48808a !important;
     }
-      
-    .tag-Introduction > button.solved-challenge {
-      border: 5px solid;
-      border-color: #a6da95;
-      border-radius: 5px;
-    }
-    .tag-Facile > button.solved-challenge {
-      border: 5px solid;
-      border-color: #a6da95;
-      border-radius: 5px;
-    }
-    .tag-Moyen > button.solved-challenge {
-      border: 5px solid;
-      border-color: #a6da95;
-      border-radius: 5px;
-    }
-    .tag-Difficile > button.solved-challenge {
-      border: 5px solid;
-      border-color: #a6da95;
-      border-radius: 5px;
-    }
-    .tag-Démon > button.solved-challenge {
-      border: 5px solid;
-      border-color: #a6da95;
-      border-radius: 5px;
-    }
-      
-    body {
-      background-color: #212529
-    }
-    h4, .h4, h3, .h3, h2, .h2, h1, .h1 {
-      color: #dee2e6;
-    }
-    
-    p, li {
-      color: white;
-    }
-      
-    .challenge-desc p {
-      color: black;
-    }
-    
-    .challenge-button {
-      &:hover {
-        background-color: #212529;
-        border-color: inherit; /* Keeps original border color on hover */
-      }
-    }
-      
-    .challenge-button > p{
+  }
+
+  /* Challenge difficulty */
+  button.tag-Introduction {
+    border: 5px solid #cad3f5 !important;
+    border-radius: 5px;
+  }
+
+  button.tag-Facile {
+    border: 5px solid #a6da95 !important;
+    border-radius: 5px;
+  }
+
+  button.tag-Moyen {
+    border: 5px solid #eed49f !important;
+    border-radius: 5px;
+  }
+
+  button.tag-Difficile {
+    border: 5px solid #ed8796 !important;
+    border-radius: 5px;
+  }
+
+  button.tag-D\u00e9mon {
+    border: 5px solid #c6a0f6 !important;
+    border-radius: 5px;
+  }
+
+  /* Customize challenge display */
+  .challenge-button {
+    box-shadow: 3px 3px 3px grey;
+
+    p {
       overflow: hidden;
       white-space: nowrap;
       text-overflow: ellipsis;
     }
-    table thead td, table tbody td, table tbody tr, label{
-      color: #ffff;
+
+    &:hover {
+      background-color: var(--bs-body-color);
     }
-      
-      
-    h2.challenge-name, h3.challenge-value, #solves table thead td, #solves table tbody td{
-        color: #000000 !important;
+
+    .challenge-solved {
+      background-color: #a6da95 !important;
+      border: 5px solid;
+      border-color: #a6da95;
+      border-radius: 5px;
     }
-      
-    h1 .btn{
-        padding:20px!important;
-        color:black!important;
-        background-color:white!important;
-        border-radius:5px!important;
-        font-size:20px!important;
-      }
-    h1 .btn:hover{
-        background-color:#48808a!important;
-    }
-      
-    blockquote p, .card-title, .modal-body p{
-      color:black;
-    }
-      
-    tr td a {
-      color: white;
-    }
-    
-    </style>
-    
+  }
+</style>
