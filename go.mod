@@ -6,7 +6,7 @@ require (
 	github.com/ctfer-io/go-ctfd v0.14.0
 	github.com/invopop/jsonschema v0.13.0
 	github.com/pkg/errors v0.9.1
-	github.com/stretchr/testify v1.10.0
+	github.com/stretchr/testify v1.11.0
 	github.com/urfave/cli/v3 v3.4.1
 	github.com/xeipuuv/gojsonschema v1.2.0
 	go.uber.org/multierr v1.11.0
