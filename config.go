@@ -29,6 +29,8 @@ type (
 
 		// The mode of your CTFd, either users or teams.
 		Mode string `yaml:"mode,omitempty" json:"mode,omitempty" jsonschema:"enum=users,enum=teams,default=users"`
+
+		Uploads []*Upload `yaml:"uploads,omitempty" json:"uploads,omitempty"`
 	}
 
 	// Appearance of the CTFd.
@@ -266,6 +268,18 @@ type (
 		// The administrator password, recommended to use the varenvs. Immutable, or need the administrator to change the CTFd data AND the configuration file.
 		Password FromEnv `yaml:"password,omitempty" json:"password,omitempty" jsonschema:"required"`
 	}
+
+	// Upload defines a file or content to upload as per the setup. Does not upload twice if already exist.
+	// One use case is to upload logos and use them in an alternative index.html page for an event.
+	//
+	// WARNING: if a file is removed from the list, it won't be deleted by ctfd-setup.
+	Upload struct {
+		File *File `yaml:"file" json:"file" jsonschema:"required"`
+
+		// Where to upload it.
+		// This enables to use a file at a static location in, e.g., custom pages.
+		Location string `yaml:"location" json:"location" jsonschema:"required"`
+	}
 )
 
 func NewConfig() *Config {
@@ -301,7 +315,8 @@ func NewConfig() *Config {
 				Content: &File{},
 			},
 		},
-		Mode: "users", // default value
+		Mode:    "users", // default value
+		Uploads: []*Upload{},
 	}
 }
 

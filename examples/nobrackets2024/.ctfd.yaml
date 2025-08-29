@@ -43,3 +43,26 @@ pages:
       format: markdown
       content:
         from_file: index.html
+
+uploads:
+  - file:
+      from_file: images/nbc.png
+    location: images/nbc.png
+  - file:
+      from_file: images/pec-white.png
+    location: images/pec-white.png
+  - file:
+      from_file: images/pec.png
+    location: images/pec.png
+  - file:
+      from_file: images/rm-pro-white.svg
+    location: images/rm-pro-white.svg
+  - file:
+      from_file: images/rm-pro.svg
+    location: images/rm-pro.svg
+  - file:
+      from_file: images/synacktiv-white.png
+    location: images/synacktiv-white.png
+  - file:
+      from_file: images/synacktiv.png
+    location: images/synacktiv.png
