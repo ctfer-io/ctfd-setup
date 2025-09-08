@@ -2,10 +2,13 @@ package ctfdsetup
 
 import (
 	"context"
+	"crypto/sha1"
+	"encoding/hex"
 	"net/http"
 
 	"github.com/ctfer-io/go-ctfd/api"
 	"github.com/pkg/errors"
+	"go.uber.org/multierr"
 	"go.uber.org/zap"
 )
 
@@ -199,6 +202,51 @@ func updateSetup(ctx context.Context, client *api.Client, conf *Config) error {
 	if conf.Pages != nil && len(conf.Pages.Additional) != 0 {
 		if err := additionalPages(ctx, client, conf.Pages.Additional); err != nil {
 			return err
+		}
+	}
+
+	// Upload files
+	if len(conf.Uploads) != 0 {
+		var merr error
+		for _, f := range conf.Uploads {
+			// Compute file hash
+			h := sha1.New()
+			_, err := h.Write(f.File.Content)
+			if err != nil {
+				merr = multierr.Append(merr, errors.Wrapf(err, "computing hash of %s", f.File.Name))
+				continue
+			}
+			x := hex.EncodeToString(h.Sum(nil))
+
+			// Get the file from CTFd
+			fs, err := client.GetFiles(&api.GetFilesParams{
+				Location: &f.Location,
+			}, api.WithContext(ctx))
+			if err != nil {
+				merr = multierr.Append(merr, errors.Wrapf(err, "getting file at %s", f.Location))
+				continue
+			}
+
+			// Check if need re-push
+			if len(fs) != 0 && fs[0].SHA1sum == x {
+				continue
+			}
+
+			// Else push it (or update it)
+			logger.Debug("uploading file",
+				zap.String("location", f.Location),
+			)
+			if _, err := client.PostFiles(&api.PostFilesParams{
+				Files: []*api.InputFile{
+					(*api.InputFile)(f.File),
+				},
+				Location: &f.Location,
+			}, api.WithContext(ctx)); err != nil {
+				merr = multierr.Append(merr, err)
+			}
+		}
+		if merr != nil {
+			return merr
 		}
 	}
 
