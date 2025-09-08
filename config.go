@@ -17,6 +17,7 @@ type (
 		Appearance       Appearance        `yaml:"appearance"                   json:"appearance"                   jsonschema:"required"`
 		Theme            *Theme            `yaml:"theme,omitempty"              json:"theme,omitempty"`
 		Accounts         *Accounts         `yaml:"accounts,omitempty"           json:"accounts,omitempty"`
+		Challenges       *Challenges       `yaml:"challenges,omitempty"         json:"challenges,omitempty"`
 		Pages            *Pages            `yaml:"pages,omitempty"              json:"pages,omitempty"`
 		MajorLeagueCyber *MajorLeagueCyber `yaml:"major_league_cyber,omitempty" json:"major_league_cyber,omitempty"`
 		Settings         *Settings         `yaml:"settings,omitempty"           json:"settings,omitempty"`
@@ -88,6 +89,9 @@ type (
 		// Maximum size (number of players) in a team.
 		TeamSize *int `yaml:"team_size,omitempty" json:"team_size,omitempty"`
 
+		// Minimal length of passwords.
+		PasswordMinLength *int `yaml:"password_min_length,omitempty" json:"password_min_length,omitempty"`
+
 		// The total number of teams allowed.
 		NumTeams *int `yaml:"num_teams,omitempty" json:"num_teams,omitempty"`
 
@@ -102,6 +106,24 @@ type (
 
 		// Whether a user can change its name or not.
 		NameChanges *bool `yaml:"name_changes,omitempty" json:"name_changes,omitempty"`
+	}
+
+	// Challenge-related configurations.
+	Challenges struct {
+		// Whether a player can see itw own previous submissions.
+		ViewSelfSubmission bool `yaml:"view_self_submissions" json:"view_self_submissions"`
+
+		// The behavior to adopt in case a player reached the submission rate limiting.
+		MaxAttemptsBehavior string `yaml:"max_attempts_behavior" json:"max_attempts_behavior" jsonschema:"enum=lockout,enum=timeout,default=lockout"`
+
+		// The duration of the submission rate limit for further submissions.
+		MaxAttemptsTimeout int `yaml:"max_attempts_timeout" json:"max_attempts_timeout"`
+
+		// Control whether users must be logged in to see free hints.
+		HintsFreePublicAccess bool `yaml:"hints_free_public_access" json:"hints_free_public_access"`
+
+		// Who can see and submit challenge ratings.
+		ChallengeRatings string `yaml:"challenge_ratings" json:"challenge_ratings" jsonschema:"enum=public,enum=private,enum=disabled,default=public"`
 	}
 
 	// Pages global configuration.
@@ -238,6 +260,9 @@ type (
 	Social struct {
 		// Whether to enable users share they solved a challenge or not.
 		Shares *bool `yaml:"shares,omitempty" json:"shares,omitempty"`
+
+		// A template for social shares.
+		Template *File `yaml:"template,omitempty" json:"template,omitempty"`
 	}
 
 	// Legal contents for players.
@@ -293,6 +318,10 @@ func NewConfig() *Config {
 			Settings:  &File{},
 		},
 		Accounts: &Accounts{},
+		Challenges: &Challenges{
+			MaxAttemptsBehavior: "lockout",
+			ChallengeRatings:    "public",
+		},
 		Pages: &Pages{
 			RobotsTxt: &File{},
 		},

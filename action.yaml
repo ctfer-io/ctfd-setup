@@ -48,6 +48,8 @@ inputs:
     description: 'Whether to allow team creation by players or not.'
   accounts_team_size:
     description: 'Maximum size (number of players) in a team.'
+  accounts_password_min_length:
+    description: 'Minimal length of password.'
   accounts_num_teams:
     description: 'The total number of teams allowed.'
   accounts_num_users:
@@ -58,6 +60,17 @@ inputs:
     description: 'Maximum number of invalid submissions per minute (per user/team). We suggest you use it as part of an anti-brute-force strategy (rate limiting).'
   accounts_name_changes:
     description: 'Whether a user can change its name or not.'
+  # Challenges
+  challenges_view_self_submissions:
+    description: 'Whether a player can see itw own previous submissions.'
+  challenges_max_attempts_behavior:
+    description: 'The behavior to adopt in case a player reached the submission rate limiting.'
+  challenges_max_attempts_timeout:
+    description: 'The duration of the submission rate limit for further submissions.'
+  challenges_hints_free_public_access:
+    description: 'Control whether users must be logged in to see free hints.'
+  challenges_challenge_ratings:
+    description: 'Who can see and submit challenge ratings.'
   # Pages
   pages_robots_txt:
     description: 'Define the /robots.txt file content, for web crawlers indexing.'
@@ -133,6 +146,8 @@ inputs:
   # Social
   social_shares:
     description: 'Whether to enable users share they solved a challenge or not.'
+  social_template:
+    description: 'A template for social shares. Provide a path to a locally-accessible file.'
   # Legal
   legal_tos_url:
     description: 'The Terms of Services URL.'
@@ -175,11 +190,17 @@ runs:
     ACCOUNTS_VERIFY_EMAILS: ${{ inputs.accounts_verify_emails }}
     ACCOUNTS_TEAM_CREATION: ${{ inputs.accounts_team_creation }}
     ACCOUNTS_TEAM_SIZE: ${{ inputs.accounts_team_size }}
+    ACCOUNTS_PASSWORD_MIN_LENGTH: ${{ inputs.accounts_password_min_length }}
     ACCOUNTS_NUM_TEAMS: ${{ inputs.accounts_num_teams }}
     ACCOUNTS_NUM_USERS: ${{ inputs.accounts_num_users }}
     ACCOUNTS_TEAM_DISBANDING: ${{ inputs.accounts_team_disbanding }}
     ACCOUNTS_INCORRECT_SUBMISSIONS_PER_MINUTE: ${{ inputs.accounts_incorrect_submissions_per_minute }}
     ACCOUNTS_NAME_CHANGES: ${{ inputs.accounts_name_changes }}
+    CHALLENGES_VIEW_SELF_SUBMISSIONS: ${{ inputs.challenges_view_self_submissions }}
+    CHALLENGES_MAX_ATTEMPTS_BEHAVIOR: ${{ inputs.challenges_max_attempts_behavior }}
+    CHALLENGES_MAX_ATTEMPTS_TIMEOUT: ${{ inputs.challenges_max_attempts_timeout }}
+    CHALLENGES_HINTS_FREE_PUBLIC_ACCESS: ${{ inputs.challenges_hints_free_public_access }}
+    CHALLENGES_CHALLENGE_RATINGS: ${{ inputs.challenges_challenge_ratings }}
     PAGES_ROBOTS_TXT: ${{ inputs.pages_robots_txt }}
     MAJOR_LEAGUE_CYBER_CLIENT_ID: ${{ inputs.major_league_cyber_client_id }}
     MAJOR_LEAGUE_CYBER_CLIENT_SECRET: ${{ inputs.major_league_cyber_client_secret }}
@@ -212,6 +233,7 @@ runs:
     TIME_FREEZE: ${{ inputs.time_freeze }}
     TIME_VIEW_AFTER: ${{ inputs.time_view_after }}
     SOCIAL_SHARES: ${{ inputs.social_shares }}
+    SOCIAL_TEMPLATE: ${{ inputs.social_template }}
     LEGAL_TOS_URL: ${{ inputs.legal_tos_url }}
     LEGAL_TOS_CONTENT: ${{ inputs.legal_tos_content }}
     LEGAL_PRIVACY_POLICY_URL: ${{ inputs.legal_privacy_policy_url }}
