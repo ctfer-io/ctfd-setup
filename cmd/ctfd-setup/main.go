@@ -156,6 +156,12 @@ func main() {
 				Category: configuration,
 			},
 			&cli.IntFlag{
+				Name:     "accounts.password_min_length",
+				Usage:    "Minimal length of password.",
+				Sources:  cli.EnvVars("ACCOUNTS_PASSWORD_MIN_LENGTH", "PLUGIN_ACCOUNTS_PASSWORD_MIN_LENGTH"),
+				Category: configuration,
+			},
+			&cli.IntFlag{
 				Name:     "accounts.num_teams",
 				Usage:    "The total number of teams allowed.",
 				Sources:  cli.EnvVars("ACCOUNTS_NUM_TEAMS", "PLUGIN_ACCOUNTS_NUM_TEAMS"),
@@ -183,6 +189,39 @@ func main() {
 				Name:     "accounts.name_changes",
 				Usage:    "Whether a user can change its name or not.",
 				Sources:  cli.EnvVars("ACCOUNTS_NAME_CHANGES", "PLUGIN_ACCOUNTS_NAME_CHANGES"),
+				Category: configuration,
+			},
+			// => Challenges
+			&cli.BoolFlag{
+				Name:     "challenges.view_self_submissions",
+				Usage:    "Whether a player can see itw own previous submissions.",
+				Sources:  cli.EnvVars("CHALLENGES_VIEW_SELF_SUBMISSIONS", "PLUGIN_CHALLENGES_VIEW_SELF_SUBMISSIONS"),
+				Category: configuration,
+			},
+			&cli.StringFlag{
+				Name:     "challenges.max_attempts_behavior",
+				Usage:    "The behavior to adopt in case a player reached the submission rate limiting.",
+				Value:    "lockout",
+				Sources:  cli.EnvVars("CHALLENGES_MAX_ATTEMPTS_BEHAVIOR", "PLUGIN_CHALLENGES_MAX_ATTEMPTS_BEHAVIOR"),
+				Category: configuration,
+			},
+			&cli.IntFlag{
+				Name:     "challenges.max_attempts_timeout",
+				Usage:    "The duration of the submission rate limit for further submissions.",
+				Sources:  cli.EnvVars("CHALLENGES_MAX_ATTEMPTS_TIMEOUT", "PLUGIN_CHALLENGES_MAX_ATTEMPTS_TIMEOUT"),
+				Category: configuration,
+			},
+			&cli.BoolFlag{
+				Name:     "challenges.hints_free_public_access",
+				Usage:    "Control whether users must be logged in to see free hints.",
+				Sources:  cli.EnvVars("CHALLENGES_HINTS_FREE_PUBLIC_ACCESS", "PUBLIC_CHALLENGES_HINTS_FREE_PUBLIC_ACCESS"),
+				Category: configuration,
+			},
+			&cli.StringFlag{
+				Name:     "challenges.challenge_ratings",
+				Usage:    "Who can see and submit challenge ratings.",
+				Value:    "public",
+				Sources:  cli.EnvVars("CHALLENGES_CHALLENGE_RATINGS", "PUBLIC_CHALLENGES_CHALLENGE_RATINGS"),
 				Category: configuration,
 			},
 			// => Pages
@@ -388,6 +427,12 @@ func main() {
 				Sources:  cli.EnvVars("SOCIAL_SHARES", "PLUGIN_SOCIAL_SHARES"),
 				Category: configuration,
 			},
+			&cli.StringFlag{
+				Name:     "social.template",
+				Usage:    "A template for social shares. Provide a path to a locally-accessible file.",
+				Sources:  cli.EnvVars("SOCIAL_TEMPLATE", "PUBLIC_SOCIAL_TEMPLATE"),
+				Category: configuration,
+			},
 			// => Legal
 			&cli.StringFlag{
 				Name:     "legal.tos.url",
@@ -516,6 +561,11 @@ func run(ctx context.Context, cmd *cli.Command) error {
 	if err != nil {
 		return err
 	}
+	socialTpl, err := filePtr(cmd, "social.template")
+	if err != nil {
+		return err
+	}
+
 	tos, err := filePtr(cmd, "legal.tos.content")
 	if err != nil {
 		return err
@@ -545,11 +595,19 @@ func run(ctx context.Context, cmd *cli.Command) error {
 			VerifyEmails:                  cmd.Bool("accounts.verify_emails"),
 			TeamCreation:                  boolPtr(cmd, "accounts.team_creation"),
 			TeamSize:                      intPtr(cmd, "accounts.team_size"),
+			PasswordMinLength:             intPtr(cmd, "accounts.password_min_length"),
 			NumTeams:                      intPtr(cmd, "accounts.num_teams"),
 			NumUsers:                      intPtr(cmd, "accounts.num_users"),
 			TeamDisbanding:                stringPtr(cmd, "accounts.team_disbanding"),
 			IncorrectSubmissionsPerMinute: intPtr(cmd, "accounts.incorrect_submissions_per_minute"),
 			NameChanges:                   boolPtr(cmd, "accounts.name_changes"),
+		},
+		Challenges: &ctfdsetup.Challenges{
+			ViewSelfSubmission:    cmd.Bool("challenges.view_self_submissions"),
+			MaxAttemptsBehavior:   cmd.String("challenges.max_attempts_behavior"),
+			MaxAttemptsTimeout:    cmd.Int("challenges.max_attempts_timeout"),
+			HintsFreePublicAccess: cmd.Bool("challenges.hints_free_public_access"),
+			ChallengeRatings:      cmd.String("challenges.challenge_ratings"),
 		},
 		Pages: &ctfdsetup.Pages{
 			RobotsTxt: robotsTxt,
@@ -603,7 +661,8 @@ func run(ctx context.Context, cmd *cli.Command) error {
 			ViewAfter: boolPtr(cmd, "time.view_after"),
 		},
 		Social: &ctfdsetup.Social{
-			Shares: boolPtr(cmd, "social.shares"),
+			Shares:   boolPtr(cmd, "social.shares"),
+			Template: socialTpl,
 		},
 		Legal: &ctfdsetup.Legal{
 			TOS: ctfdsetup.ExternalReference{
