@@ -335,7 +335,9 @@ func NewConfig() *Config {
 		Security: &Security{},
 		Email:    &Email{},
 		Time:     &Time{},
-		Social:   &Social{},
+		Social: &Social{
+			Template: &File{},
+		},
 		Legal: &Legal{
 			TOS: ExternalReference{
 				Content: &File{},
