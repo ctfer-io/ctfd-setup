@@ -356,6 +356,8 @@ func (conf Config) Schema() ([]byte, error) {
 	reflector := jsonschema.Reflector{}
 	_ = reflector.AddGoComments("github.com/ctfer-io/ctfd-setup", "./") // this could fail once binary is compiled, thus ignored (no problem)
 	r := reflector.Reflect(&Config{})
+	r.ID = "https://json.schemastore.org/ctfd.json" // set the Schemastore ID
+
 	return json.MarshalIndent(r, "", "  ")
 }
 
