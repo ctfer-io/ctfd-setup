@@ -27,7 +27,7 @@ inputs:
     description: 'The frontend small icon. Provide a path to a locally-accessible file.'
   theme_name:
     description: 'The frontend theme name.'
-    default: 'core-beta'
+    default: 'core'
   theme_color:
     description: 'The frontend theme color.'
   theme_header:
@@ -65,12 +65,14 @@ inputs:
     description: 'Whether a player can see itw own previous submissions.'
   challenges_max_attempts_behavior:
     description: 'The behavior to adopt in case a player reached the submission rate limiting.'
+    default: 'lockout'
   challenges_max_attempts_timeout:
     description: 'The duration of the submission rate limit for further submissions.'
   challenges_hints_free_public_access:
     description: 'Control whether users must be logged in to see free hints.'
   challenges_challenge_ratings:
     description: 'Who can see and submit challenge ratings.'
+    default: 'public'
   # Pages
   pages_robots_txt:
     description: 'Define the /robots.txt file content, for web crawlers indexing.'
@@ -171,7 +173,7 @@ inputs:
 
 runs:
   using: 'docker'
-  image: 'docker://ctferio/ctfd-setup:v1.7.2'
+  image: 'docker://ctferio/ctfd-setup:v1.7.3'
   env:
     FILE: ${{ inputs.file }}
     URL: ${{ inputs.url }}
