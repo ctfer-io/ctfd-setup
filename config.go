@@ -57,7 +57,7 @@ type (
 		SmallIcon *File `yaml:"small_icon,omitempty" json:"small_icon,omitempty"`
 
 		// The frontend theme name.
-		Name string `yaml:"name,omitempty" json:"name,omitempty" jsonschema:"default=core-beta"` // do not restrict to core-beta or core (deprecated) to avoid limiting to official themes
+		Name string `yaml:"name,omitempty" json:"name,omitempty" jsonschema:"default=core"` // do not restrict to core-deprecated or core to avoid limiting to official themes
 
 		// The frontend theme color.
 		Color string `yaml:"color,omitempty" json:"color,omitempty"`
@@ -310,7 +310,7 @@ type (
 func NewConfig() *Config {
 	return &Config{
 		Theme: &Theme{
-			Name:      "core-beta",
+			Name:      "core",
 			Logo:      &File{},
 			SmallIcon: &File{},
 			Header:    &File{},
