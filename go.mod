@@ -1,9 +1,9 @@
 module github.com/ctfer-io/ctfd-setup
 
-go 1.22.2
+go 1.25.4
 
 require (
-	github.com/ctfer-io/go-ctfd v0.15.1
+	github.com/ctfer-io/go-ctfd v0.16.0
 	github.com/invopop/jsonschema v0.13.0
 	github.com/pkg/errors v0.9.1
 	github.com/stretchr/testify v1.11.1
