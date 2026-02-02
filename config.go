@@ -285,13 +285,13 @@ type (
 	// Admin accesses
 	Admin struct {
 		// The administrator name. Immutable, or need the administrator to change the CTFd data AND the configuration file
-		Name string `yaml:"name,omitempty" json:"name,omitempty" jsonschema:"required"`
+		Name FromEnv `yaml:"name,omitempty" json:"name,omitempty" jsonschema:"required"`
 
 		// The administrator email address. Immutable, or need the administrator to change the CTFd data AND the configuration file
-		Email string `yaml:"email,omitempty" json:"email,omitempty" jsonschema:"required"`
+		Email FromEnv `yaml:"email,omitempty" json:"email,omitempty" jsonschema:"required"`
 
 		// The administrator password, recommended to use the varenvs. Immutable, or need the administrator to change the CTFd data AND the configuration file
-		Password FromEnv `yaml:"password,omitempty" json:"password,omitempty" jsonschema:"required"`
+		Password FromEnv `yaml:"password" json:"password" jsonschema:"required"`
 	}
 
 	// Upload defines a file or content to upload as per the setup. Does not upload twice if already exist.

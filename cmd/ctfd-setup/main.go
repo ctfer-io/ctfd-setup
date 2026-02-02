@@ -582,115 +582,7 @@ func run(ctx context.Context, cmd *cli.Command) error {
 	if err != nil {
 		return err
 	}
-	conf := &ctfdsetup.Config{
-		Appearance: ctfdsetup.Appearance{
-			Name:          cmd.String("appearance.name"),
-			Description:   cmd.String("appearance.description"),
-			DefaultLocale: stringPtr(cmd, "appearance.default_locale"),
-		},
-		Theme: &ctfdsetup.Theme{
-			Logo:      logo,
-			SmallIcon: smallIcon,
-			Name:      cmd.String("theme.name"),
-			Color:     cmd.String("theme.color"),
-			Header:    header,
-			Footer:    footer,
-			Settings:  settings,
-		},
-		Accounts: &ctfdsetup.Accounts{
-			DomainWhitelist:               stringPtr(cmd, "accounts.domain_whitelist"),
-			DomainBlacklist:               stringPtr(cmd, "accounts.domain_blacklist"),
-			VerifyEmails:                  cmd.Bool("accounts.verify_emails"),
-			TeamCreation:                  boolPtr(cmd, "accounts.team_creation"),
-			TeamSize:                      intPtr(cmd, "accounts.team_size"),
-			PasswordMinLength:             intPtr(cmd, "accounts.password_min_length"),
-			NumTeams:                      intPtr(cmd, "accounts.num_teams"),
-			NumUsers:                      intPtr(cmd, "accounts.num_users"),
-			TeamDisbanding:                stringPtr(cmd, "accounts.team_disbanding"),
-			IncorrectSubmissionsPerMinute: intPtr(cmd, "accounts.incorrect_submissions_per_minute"),
-			NameChanges:                   boolPtr(cmd, "accounts.name_changes"),
-		},
-		Challenges: &ctfdsetup.Challenges{
-			ViewSelfSubmission:    cmd.Bool("challenges.view_self_submissions"),
-			MaxAttemptsBehavior:   cmd.String("challenges.max_attempts_behavior"),
-			MaxAttemptsTimeout:    cmd.Int("challenges.max_attempts_timeout"),
-			HintsFreePublicAccess: cmd.Bool("challenges.hints_free_public_access"),
-			ChallengeRatings:      cmd.String("challenges.challenge_ratings"),
-		},
-		Pages: &ctfdsetup.Pages{
-			RobotsTxt: robotsTxt,
-		},
-		MajorLeagueCyber: &ctfdsetup.MajorLeagueCyber{
-			ClientID:     stringPtr(cmd, "major_league_cyber.client_id"),
-			ClientSecret: stringPtr(cmd, "major_league_cyber.client_secret"),
-		},
-		Settings: &ctfdsetup.Settings{
-			ChallengeVisibility:    cmd.String("settings.challenge_visibility"),
-			AccountVisibility:      cmd.String("settings.account_visibility"),
-			ScoreVisibility:        cmd.String("settings.score_visibility"),
-			RegistrationVisibility: cmd.String("settings.registration_visibility"),
-			Paused:                 boolPtr(cmd, "settings.paused"),
-		},
-		Security: &ctfdsetup.Security{
-			HTMLSanitization: boolPtr(cmd, "security.html_sanitization"),
-			RegistrationCode: stringPtr(cmd, "security.registration_code"),
-		},
-		Email: &ctfdsetup.Email{
-			Registration: ctfdsetup.EmailContent{
-				Subject: stringPtr(cmd, "email.registration.subject"),
-				Body:    stringPtr(cmd, "email.registration.body"),
-			},
-			Confirmation: ctfdsetup.EmailContent{
-				Subject: stringPtr(cmd, "email.confirmation.subject"),
-				Body:    stringPtr(cmd, "email.confirmation.body"),
-			},
-			NewAccount: ctfdsetup.EmailContent{
-				Subject: stringPtr(cmd, "email.new_account.subject"),
-				Body:    stringPtr(cmd, "email.new_account.body"),
-			},
-			PasswordReset: ctfdsetup.EmailContent{
-				Subject: stringPtr(cmd, "email.password_reset.subject"),
-				Body:    stringPtr(cmd, "email.password_reset.body"),
-			},
-			PasswordResetConfirmation: ctfdsetup.EmailContent{
-				Subject: stringPtr(cmd, "email.password_reset_confirmation.subject"),
-				Body:    stringPtr(cmd, "email.password_reset_confirmation.body"),
-			},
-			From:     stringPtr(cmd, "email.mail_from"),
-			Server:   stringPtr(cmd, "email.mail_server"),
-			Port:     stringPtr(cmd, "email.mail_server_port"),
-			Username: stringPtr(cmd, "email.username"),
-			Password: stringPtr(cmd, "email.password"),
-		},
-		Time: &ctfdsetup.Time{
-			Start:     stringPtr(cmd, "time.start"),
-			End:       stringPtr(cmd, "time.end"),
-			Freeze:    stringPtr(cmd, "time.freeze"),
-			ViewAfter: boolPtr(cmd, "time.view_after"),
-		},
-		Social: &ctfdsetup.Social{
-			Shares:   boolPtr(cmd, "social.shares"),
-			Template: socialTpl,
-		},
-		Legal: &ctfdsetup.Legal{
-			TOS: ctfdsetup.ExternalReference{
-				URL:     stringPtr(cmd, "legal.tos.url"),
-				Content: tos,
-			},
-			PrivacyPolicy: ctfdsetup.ExternalReference{
-				URL:     stringPtr(cmd, "legal.privacy_policy.url"),
-				Content: privpol,
-			},
-		},
-		Mode: cmd.String("mode"),
-		Admin: ctfdsetup.Admin{
-			Name:  cmd.String("admin.name"),
-			Email: cmd.String("admin.email"),
-			Password: ctfdsetup.FromEnv{
-				Content: cmd.String("admin.password"),
-			},
-		},
-	}
+	conf := ctfdsetup.NewConfig()
 
 	// Read and unmarshal setup config file if any
 	if f := cmd.String("file"); f != "" {
@@ -711,6 +603,88 @@ func run(ctx context.Context, cmd *cli.Command) error {
 		}
 	}
 
+	// Then override with all CLI flags.
+	// This is especially usefull to define placeholders in configuration file but
+	// use real credentials provided from environment variables within CI (or any other automation).
+	overrideForDefaultString(cmd, &conf.Appearance.Name, "appearance.name")
+	overrideForDefaultString(cmd, &conf.Appearance.Description, "appearance.description")
+	overrideForDefaultStringPtr(cmd, &conf.Appearance.DefaultLocale, "appearance.default_locale")
+
+	conf.Theme.Logo = logo
+	conf.Theme.SmallIcon = smallIcon
+	overrideForDefaultString(cmd, &conf.Theme.Name, "theme.name")
+	overrideForDefaultString(cmd, &conf.Theme.Color, "theme.color")
+	conf.Theme.Header = header
+	conf.Theme.Footer = footer
+	conf.Theme.Settings = settings
+
+	overrideForDefaultStringPtr(cmd, &conf.Accounts.DomainWhitelist, "accounts.domain_whitelist")
+	overrideForDefaultStringPtr(cmd, &conf.Accounts.DomainBlacklist, "accounts.domain_blacklist")
+	overrideForDefaultBool(cmd, &conf.Accounts.VerifyEmails, "accounts.verify_emails")
+	overrideForDefaultBoolPtr(cmd, &conf.Accounts.TeamCreation, "accounts.team_creation")
+	overrideForDefaultIntPtr(cmd, &conf.Accounts.TeamSize, "accounts.team_size")
+	overrideForDefaultIntPtr(cmd, &conf.Accounts.PasswordMinLength, "accounts.password_min_length")
+	overrideForDefaultIntPtr(cmd, &conf.Accounts.NumTeams, "accounts.num_teams")
+	overrideForDefaultIntPtr(cmd, &conf.Accounts.NumUsers, "accounts.num_users")
+	overrideForDefaultStringPtr(cmd, &conf.Accounts.TeamDisbanding, "accounts.team_disbanding")
+	overrideForDefaultIntPtr(cmd, &conf.Accounts.IncorrectSubmissionsPerMinute, "accounts.incorrect_submissions_per_minute")
+	overrideForDefaultBoolPtr(cmd, &conf.Accounts.NameChanges, "accounts.name_changes")
+
+	overrideForDefaultBool(cmd, &conf.Challenges.ViewSelfSubmission, "challenges.view_self_submissions")
+	overrideForDefaultString(cmd, &conf.Challenges.MaxAttemptsBehavior, "challenges.max_attempts_behavior")
+	overrideForDefaultInt(cmd, &conf.Challenges.MaxAttemptsTimeout, "challenges.max_attempts_timeout")
+	overrideForDefaultBool(cmd, &conf.Challenges.HintsFreePublicAccess, "challenges.hints_free_public_access")
+	overrideForDefaultString(cmd, &conf.Challenges.ChallengeRatings, "challenges.challenge_ratings")
+
+	conf.Pages.RobotsTxt = robotsTxt
+
+	overrideForDefaultStringPtr(cmd, &conf.MajorLeagueCyber.ClientID, "major_league_cyber.client_id")
+	overrideForDefaultStringPtr(cmd, &conf.MajorLeagueCyber.ClientSecret, "major_league_cyber.client_secret")
+
+	overrideForDefaultString(cmd, &conf.Settings.ChallengeVisibility, "settings.challenge_visibility")
+	overrideForDefaultString(cmd, &conf.Settings.AccountVisibility, "settings.account_visibility")
+	overrideForDefaultString(cmd, &conf.Settings.ScoreVisibility, "settings.score_visibility")
+	overrideForDefaultString(cmd, &conf.Settings.RegistrationVisibility, "settings.registration_visibility")
+	overrideForDefaultBoolPtr(cmd, &conf.Settings.Paused, "settings.paused")
+
+	overrideForDefaultBoolPtr(cmd, &conf.Security.HTMLSanitization, "security.html_sanitization")
+	overrideForDefaultStringPtr(cmd, &conf.Security.RegistrationCode, "security.registration_code")
+
+	overrideForDefaultStringPtr(cmd, &conf.Email.Registration.Subject, "email.registration.subject")
+	overrideForDefaultStringPtr(cmd, &conf.Email.Registration.Body, "email.registration.body")
+	overrideForDefaultStringPtr(cmd, &conf.Email.Confirmation.Subject, "email.confirmation.subject")
+	overrideForDefaultStringPtr(cmd, &conf.Email.Confirmation.Body, "email.confirmation.body")
+	overrideForDefaultStringPtr(cmd, &conf.Email.NewAccount.Subject, "email.new_account.subject")
+	overrideForDefaultStringPtr(cmd, &conf.Email.NewAccount.Body, "email.new_account.body")
+	overrideForDefaultStringPtr(cmd, &conf.Email.PasswordReset.Subject, "email.password_reset.subject")
+	overrideForDefaultStringPtr(cmd, &conf.Email.PasswordReset.Body, "email.password_reset.body")
+	overrideForDefaultStringPtr(cmd, &conf.Email.PasswordResetConfirmation.Subject, "email.password_reset_confirmation.subject")
+	overrideForDefaultStringPtr(cmd, &conf.Email.PasswordResetConfirmation.Body, "email.password_reset_confirmation.body")
+	overrideForDefaultStringPtr(cmd, &conf.Email.From, "email.mail_from")
+	overrideForDefaultStringPtr(cmd, &conf.Email.Server, "email.mail_server")
+	overrideForDefaultStringPtr(cmd, &conf.Email.Port, "email.mail_server_port")
+	overrideForDefaultStringPtr(cmd, &conf.Email.Username, "email.username")
+	overrideForDefaultStringPtr(cmd, &conf.Email.Password, "email.password")
+
+	overrideForDefaultStringPtr(cmd, &conf.Time.Start, "time.start")
+	overrideForDefaultStringPtr(cmd, &conf.Time.End, "time.end")
+	overrideForDefaultStringPtr(cmd, &conf.Time.Freeze, "time.freeze")
+	overrideForDefaultBoolPtr(cmd, &conf.Time.ViewAfter, "time.view_after")
+
+	overrideForDefaultBoolPtr(cmd, &conf.Social.Shares, "social.shares")
+	conf.Social.Template = socialTpl
+
+	overrideForDefaultStringPtr(cmd, &conf.Legal.TOS.URL, "legal.tos.url")
+	conf.Legal.TOS.Content = tos
+	overrideForDefaultStringPtr(cmd, &conf.Legal.PrivacyPolicy.URL, "legal.privacy_policy.url")
+	conf.Legal.PrivacyPolicy.Content = privpol
+
+	overrideForDefaultString(cmd, &conf.Mode, "mode")
+
+	overrideForDefaultString(cmd, &conf.Admin.Name.Content, "admin.name")
+	overrideForDefaultString(cmd, &conf.Admin.Email.Content, "admin.email")
+	overrideForDefaultString(cmd, &conf.Admin.Password.Content, "admin.password")
+
 	if err := conf.Validate(); err != nil {
 		return err
 	}
@@ -720,18 +694,6 @@ func run(ctx context.Context, cmd *cli.Command) error {
 		return errors.New("url flag not set, is required")
 	}
 	return ctfdsetup.Setup(ctx, cmd.String("url"), cmd.String("api_key"), conf)
-}
-
-func stringPtr(cmd *cli.Command, key string) *string {
-	return genPtr(cmd, key, cmd.String)
-}
-
-func boolPtr(cmd *cli.Command, key string) *bool {
-	return genPtr(cmd, key, cmd.Bool)
-}
-
-func intPtr(cmd *cli.Command, key string) *int {
-	return genPtr(cmd, key, cmd.Int)
 }
 
 func filePtr(cmd *cli.Command, key string) (*ctfdsetup.File, error) {
@@ -749,10 +711,50 @@ func filePtr(cmd *cli.Command, key string) (*ctfdsetup.File, error) {
 	}, nil
 }
 
-func genPtr[T string | int | bool](cmd *cli.Command, key string, f func(key string) T) *T {
-	if cmd.IsSet(key) {
-		return nil
+func overrideForDefaultString(cmd *cli.Command, dst *string, key string) {
+	str := cmd.String(key)
+	if cmd.IsSet(key) && str != "" { // avoid empty strings
+		*dst = str
 	}
-	v := f(key)
-	return &v
+	// Don't change anything, it remains as it is
+}
+
+func overrideForDefaultStringPtr(cmd *cli.Command, dst **string, key string) {
+	str := cmd.String(key)
+	if cmd.IsSet(key) && str != "" { // avoid empty strings
+		*dst = &str
+	}
+	// Don't change anything, it remains as it is
+}
+
+func overrideForDefaultBool(cmd *cli.Command, dst *bool, key string) {
+	b := cmd.Bool(key)
+	if cmd.IsSet(key) && b != false { // avoid false values
+		*dst = b
+	}
+	// Don't change anything, it remains as it is
+}
+
+func overrideForDefaultBoolPtr(cmd *cli.Command, dst **bool, key string) {
+	b := cmd.Bool(key)
+	if cmd.IsSet(key) && b != false { // avoid false values
+		*dst = &b
+	}
+	// Don't change anything, it remains as it is
+}
+
+func overrideForDefaultInt(cmd *cli.Command, dst *int, key string) {
+	i := cmd.Int(key)
+	if cmd.IsSet(key) && i != 0 { // avoid zeros
+		*dst = i
+	}
+	// Don't change anything, it remains as it is
+}
+
+func overrideForDefaultIntPtr(cmd *cli.Command, dst **int, key string) {
+	i := cmd.Int(key)
+	if cmd.IsSet(key) && i != 0 { // avoid zeros
+		*dst = &i
+	}
+	// Don't change anything, it remains as it is
 }

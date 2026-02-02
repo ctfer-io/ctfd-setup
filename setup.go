@@ -37,7 +37,7 @@ func Setup(ctx context.Context, url string, apiKey string, conf *Config) error {
 		}
 	} else if apiKey == "" {
 		if err := client.Login(ctx, &api.LoginParams{
-			Name:     conf.Admin.Name,
+			Name:     conf.Admin.Name.Content,
 			Password: conf.Admin.Password.Content,
 		}); err != nil {
 			return &ErrClient{err: err}
@@ -77,8 +77,8 @@ func bareSetup(ctx context.Context, client *Client, conf *Config) error {
 		RegistrationVisibility: conf.Settings.RegistrationVisibility,
 		VerifyEmails:           conf.Accounts.VerifyEmails,
 		TeamSize:               conf.Accounts.TeamSize,
-		Name:                   conf.Admin.Name,
-		Email:                  conf.Admin.Email,
+		Name:                   conf.Admin.Name.Content,
+		Email:                  conf.Admin.Email.Content,
 		Password:               conf.Admin.Password.Content,
 	}); err != nil {
 		return &ErrClient{err: err}
