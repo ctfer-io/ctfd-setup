@@ -537,6 +537,18 @@ func main() {
 func run(ctx context.Context, cmd *cli.Command) error {
 	log := ctfdsetup.Log()
 
+	shutdown, err := ctfdsetup.SetupOtelSDK(ctx, version)
+	if err != nil {
+		return err
+	}
+	defer func() {
+		if err := shutdown(ctx); err != nil {
+			log.Error("shuttding down tracer provider",
+				zap.Error(err),
+			)
+		}
+	}()
+
 	logo, err := filePtr(cmd, "theme.logo")
 	if err != nil {
 		return err

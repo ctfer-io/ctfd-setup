@@ -1,0 +1,10 @@
+appearance:
+  name: 'OTel Demo with ctfd-setup'
+  description: 'A demonstration of OpenTelemetry and ctfd-setup, with CTFd.'
+
+admin:
+  name: ctfer
+  email: ctfer@ctfer.io
+  password: ctfer
+
+mode: 'teams'
