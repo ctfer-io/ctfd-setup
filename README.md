@@ -136,6 +136,8 @@ steps:
 
 For ease of use, you can generate and use the YAML schema using `ctfd-setup schema`.
 
+### In file
+
 **(Optional)** In your `.ctfd.yaml` file you could then prepend `# yaml-language-server: $schema=file:///path/to/schema.json`.
 
 <div align="center">
@@ -144,6 +146,19 @@ For ease of use, you can generate and use the YAML schema using `ctfd-setup sche
 
 > [!NOTE]
 > This will appear by default if your IDE has a YAML extension with support of the [JSON SchemaStore](https://www.schemastore.org/json/).
+
+### In VSCode
+
+In case you are working in an air-gapped environment or working on improving the project, you may want your schema to automatically target your configuration files.
+
+To do so, add the following to your `.vscode/settings.json`.
+```json
+{
+    "yaml.schemas": {
+        "schema.json": ".ctfd.yaml"
+    }
+}
+```
 
 ## Security
 
