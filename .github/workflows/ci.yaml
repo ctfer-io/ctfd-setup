@@ -35,7 +35,9 @@ jobs:
 
       - name: Run unit tests
         run: |
-          go test ./ -run=^Test_U -coverprofile=unit.out -json | tee -a gotest.json
+          go test ./ -run=^Test_U -coverprofile=unit.cov
+        env:
+          CTFD_URL: http://localhost:8000 # needed because TestMain looks for it, we actually don't use it
 
       - name: Wait for CTFd server
         run: |
@@ -55,21 +57,21 @@ jobs:
             exit 1
           fi
 
-      - name: Run integration test
+      - name: Run integration tests
         run: |
-          ./hack/examples.sh
+          go test ./ -run=^Test_I_ -cover -coverprofile=integration.cov
         env:
-          URL: http://localhost:8000
+          CTFD_URL: http://localhost:8000
 
       - name: Merge coverage data
         run: |
           go install go.shabbyrobe.org/gocovmerge/cmd/gocovmerge@fa4f82cfbf4d57c646c1ed0f35002bf1b89fbf7a
-          gocovmerge unit.out integration.out > cov.out
+          gocovmerge unit.cov integration.cov > all.cov
 
       - name: Upload coverage to Coveralls
         uses: shogo82148/actions-goveralls@25f5320d970fb565100cf1993ada29be1bb196a1 # v1.10.0
         with:
-          path-to-profile: cov.out
+          path-to-profile: all.cov
 
   go-lint:
     runs-on: ubuntu-latest

@@ -40,7 +40,8 @@ func main() {
 				Category: management,
 			},
 			&cli.StringFlag{
-				Name:        "dir",
+				Name:        "directory",
+				Aliases:     []string{"dir"},
 				Usage:       "The directory to parse from.",
 				Sources:     cli.EnvVars("DIRECTORY"),
 				Category:    management,
