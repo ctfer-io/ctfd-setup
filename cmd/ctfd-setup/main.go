@@ -729,7 +729,7 @@ func overrideForDefaultStringPtr(cmd *cli.Command, dst **string, key string) {
 
 func overrideForDefaultBool(cmd *cli.Command, dst *bool, key string) {
 	b := cmd.Bool(key)
-	if cmd.IsSet(key) && b != false { // avoid false values
+	if cmd.IsSet(key) && b { // avoid false values
 		*dst = b
 	}
 	// Don't change anything, it remains as it is
@@ -737,7 +737,7 @@ func overrideForDefaultBool(cmd *cli.Command, dst *bool, key string) {
 
 func overrideForDefaultBoolPtr(cmd *cli.Command, dst **bool, key string) {
 	b := cmd.Bool(key)
-	if cmd.IsSet(key) && b != false { // avoid false values
+	if cmd.IsSet(key) && b { // avoid false values
 		*dst = &b
 	}
 	// Don't change anything, it remains as it is
