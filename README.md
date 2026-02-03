@@ -15,7 +15,7 @@ This is problematic for reproducibility or sharing configuration for debugging o
 
 Moreover, the setup API does not exist, so we had to map it to what the frontend calls in [go-ctfd](https://github.com/ctfer-io/go-ctfd/blob/main/api/setup.go).
 
-To fit those gaps, we built `ctfd-setup` on top of the CTFd API. This utility helps setup a CTFd instance from a YAML configuration file, CLI flags and environment variables.
+To fill those gaps, we built `ctfd-setup` on top of the CTFd API. This utility helps setup a CTFd instance from a YAML configuration file, CLI flags and environment variables.
 Thanks to this, you can integrate it using **GitHub Actions**, **Drone CI** or even as part of your **IaC provisionning**.
 
 With `ctfd-setup` you can **setup your CTFd in a second**.
@@ -44,7 +44,7 @@ mode: users
 ```
 
 **We encourage you to version this file** such that re-deployment is easy (e.g., for test purposes, or in case of a catastrophic failure of the infra during the event).
-Nevertheless, please do not commit the admin credentials ! Use `from_env` objects instead (refer to [the YAML Schema](#schema) for more info).
+Nevertheless, please do not commit the admin credentials ! Use `from_env` objects instead (refer to [the YAML Schema](#schema) for more info) or use [CLI overrides](examples/cli-override/).
 
 It could also deploy custom pages (like the index) as follows.
 This feature is not available in CLI, [GitHub Actions](#github-actions) and [Drone CI](#drone-ci).
@@ -136,6 +136,8 @@ steps:
 
 For ease of use, you can generate and use the YAML schema using `ctfd-setup schema`.
 
+### In file
+
 **(Optional)** In your `.ctfd.yaml` file you could then prepend `# yaml-language-server: $schema=file:///path/to/schema.json`.
 
 <div align="center">
@@ -145,39 +147,15 @@ For ease of use, you can generate and use the YAML schema using `ctfd-setup sche
 > [!NOTE]
 > This will appear by default if your IDE has a YAML extension with support of the [JSON SchemaStore](https://www.schemastore.org/json/).
 
-## Security
+### In VSCode
 
-### Signature and Attestations
+In case you are working in an air-gapped environment or working on improving the project, you may want your schema to automatically target your configuration files.
 
-For deployment purposes (and especially in the deployment case of Kubernetes), you may want to ensure the integrity of what you run.
-
-The release assets are SLSA 3 and can be verified using [slsa-verifier](https://github.com/slsa-framework/slsa-verifier) using the following.
-
-```bash
-slsa-verifier verify-artifact "<path/to/release_artifact>"  \
-  --provenance-path "<path/to/release_intoto_attestation>"  \
-  --source-uri "github.com/ctfer-io/ctfd-setup" \
-  --source-tag "<tag>"
-```
-
-The Docker image is SLSA 3 and can be verified using [slsa-verifier](https://github.com/slsa-framework/slsa-verifier) using the following.
-
-```bash
-slsa-verifier slsa-verifier verify-image "ctferio/ctfd-setup:<tag>@sha256:<digest>" \
-    --source-uri "github.com/ctfer-io/ctfd-setup" \
-    --source-tag "<tag>"
-```
-
-Alternatives exist, like [Kyverno](https://kyverno.io/) for a Kubernetes-based deployment.
-
-### SBOMs
-
-A SBOM for the whole repository is generated on each release and can be found in the assets of it.
-They are signed as SLSA 3 assets. Refer to [Signature and Attestations](#signature-and-attestations) to verify their integrity.
-
-A SBOM is generated for the Docker image in its manifest, and can be inspected using the following.
-
-```bash
-docker buildx imagetools inspect "ctferio/ctfd-setup:<tag>" \
-    --format "{{ json .SBOM.SPDX }}"
+To do so, add the following to your `.vscode/settings.json`.
+```json
+{
+    "yaml.schemas": {
+        "schema.json": ".ctfd.yaml"
+    }
+}
 ```

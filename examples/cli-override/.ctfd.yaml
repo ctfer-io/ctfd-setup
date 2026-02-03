@@ -1,0 +1,8 @@
+appearance:
+  name: 'CLI Override'
+  description: 'A CTFd configured with non-hardcoded credentials!'
+
+admin:
+  name: 'placeholder'
+  email: 'placeholder'
+  password: 'placeholder'
