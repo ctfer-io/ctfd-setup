@@ -20,11 +20,12 @@ var (
 )
 
 func Test_I_Minimal(t *testing.T) {
+	ctx := t.Context()
 	t.Cleanup(func() {
-		require.NoError(t, reset(context.WithoutCancel(t.Context())))
+		require.NoError(t, reset(context.WithoutCancel(ctx)))
 	})
 
-	// Check minimal configuration works fine
+	// The infrastructure team sets up CTFd manually.
 	conf := ctfdsetup.NewConfig()
 
 	dec := yaml.NewDecoder(bytes.NewReader(minimalConf))
@@ -33,8 +34,29 @@ func Test_I_Minimal(t *testing.T) {
 	err := dec.Decode(conf)
 	require.NoError(t, err)
 
-	// Check it can be setup
-	err = ctfdsetup.Setup(context.Background(), CTFdURL, "", conf)
+	err = ctfdsetup.Setup(ctx, CTFdURL, "", conf)
+	require.NoError(t, err)
+
+	// Then they create an API key for automation purposes
+	nonce, session, err := api.GetNonceAndSession(CTFdURL, api.WithContext(ctx))
+	require.NoError(t, err)
+
+	client := api.NewClient(CTFdURL, nonce, session, "")
+
+	err = client.Login(&api.LoginParams{
+		Name:     "ctfer",
+		Password: "ctfer",
+	}, api.WithContext(ctx))
+	require.NoError(t, err)
+
+	token, err := client.PostTokens(&api.PostTokensParams{
+		Expiration:  "2222-01-01",
+		Description: "Automation API key.",
+	})
+	require.NoError(t, err)
+
+	// Finally, the automation triggers thus re-run the setup
+	err = ctfdsetup.Setup(ctx, CTFdURL, *token.Value, conf)
 	require.NoError(t, err)
 }
 
