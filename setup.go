@@ -8,16 +8,20 @@ import (
 
 	"github.com/ctfer-io/go-ctfd/api"
 	"github.com/pkg/errors"
+	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 	"go.uber.org/multierr"
 	"go.uber.org/zap"
 )
 
 func Setup(ctx context.Context, url string, apiKey string, conf *Config) error {
-	nonce, session, err := api.GetNonceAndSession(url, api.WithContext(ctx))
+	ctx, span := Tracer.Start(ctx, "Setup")
+	defer span.End()
+
+	nonce, session, err := GetNonceAndSession(ctx, url)
 	if err != nil {
 		return errors.Wrap(err, "getting CTFd nonce and session")
 	}
-	client := api.NewClient(url, nonce, session, apiKey)
+	client := NewClient(url, nonce, session, apiKey)
 
 	b, err := bare(ctx, url)
 	if err != nil {
@@ -32,10 +36,10 @@ func Setup(ctx context.Context, url string, apiKey string, conf *Config) error {
 			return err
 		}
 	} else if apiKey == "" {
-		if err := client.Login(&api.LoginParams{
+		if err := client.Login(ctx, &api.LoginParams{
 			Name:     conf.Admin.Name,
 			Password: conf.Admin.Password.Content,
-		}, api.WithContext(ctx)); err != nil {
+		}); err != nil {
 			return &ErrClient{err: err}
 		}
 	}
@@ -51,6 +55,7 @@ func bare(ctx context.Context, url string) (bool, error) {
 		CheckRedirect: func(req *http.Request, via []*http.Request) error {
 			return http.ErrUseLastResponse
 		},
+		Transport: otelhttp.NewTransport(http.DefaultTransport),
 	}
 	res, err := client.Do(req)
 	if err != nil {
@@ -59,9 +64,9 @@ func bare(ctx context.Context, url string) (bool, error) {
 	return res.StatusCode == 200, nil // 302 if already setup
 }
 
-func bareSetup(ctx context.Context, client *api.Client, conf *Config) error {
+func bareSetup(ctx context.Context, client *Client, conf *Config) error {
 	// Flatten configuration and (basic) setup it
-	if err := client.Setup(&api.SetupParams{
+	if err := client.Setup(ctx, &api.SetupParams{
 		CTFName:                conf.Appearance.Name,
 		CTFDescription:         conf.Appearance.Description,
 		UserMode:               conf.Mode,
@@ -75,30 +80,30 @@ func bareSetup(ctx context.Context, client *api.Client, conf *Config) error {
 		Name:                   conf.Admin.Name,
 		Email:                  conf.Admin.Email,
 		Password:               conf.Admin.Password.Content,
-	}, api.WithContext(ctx)); err != nil {
+	}); err != nil {
 		return &ErrClient{err: err}
 	}
 	return nil
 }
 
-func updateSetup(ctx context.Context, client *api.Client, conf *Config) error {
+func updateSetup(ctx context.Context, client *Client, conf *Config) error {
 	// Push logo
 	if conf.Theme.Logo.Name != "" {
-		lf, err := client.PostFiles(&api.PostFilesParams{
+		lf, err := client.PostFiles(ctx, &api.PostFilesParams{
 			Files: []*api.InputFile{
 				(*api.InputFile)(conf.Theme.Logo),
 			},
-		}, api.WithContext(ctx))
+		})
 		if err != nil {
 			return errors.Wrap(err, "pushing theme logo")
 		}
-		if _, err := client.PatchConfigsCTFLogo(&api.PatchConfigsCTFLogo{
+		if _, err := client.PatchConfigsCTFLogo(ctx, &api.PatchConfigsCTFLogo{
 			Value: &lf[0].Location,
-		}, api.WithContext(ctx)); err != nil {
+		}); err != nil {
 			return errors.Wrap(err, "patching CTF logo")
 		}
 	} else {
-		if _, err := client.PatchConfigsCTFLogo(&api.PatchConfigsCTFLogo{}, api.WithContext(ctx)); err != nil {
+		if _, err := client.PatchConfigsCTFLogo(ctx, &api.PatchConfigsCTFLogo{}); err != nil {
 			return err
 		}
 	}
@@ -106,21 +111,21 @@ func updateSetup(ctx context.Context, client *api.Client, conf *Config) error {
 
 	// Push small icon
 	if conf.Theme.SmallIcon.Name != "" {
-		smf, err := client.PostFiles(&api.PostFilesParams{
+		smf, err := client.PostFiles(ctx, &api.PostFilesParams{
 			Files: []*api.InputFile{
 				(*api.InputFile)(conf.Theme.SmallIcon),
 			},
-		}, api.WithContext(ctx))
+		})
 		if err != nil {
 			return errors.Wrap(err, "pushing theme small icon")
 		}
-		if _, err := client.PatchConfigsCTFSmallIcon(&api.PatchConfigsCTFLogo{
+		if _, err := client.PatchConfigsCTFSmallIcon(ctx, &api.PatchConfigsCTFLogo{
 			Value: &smf[0].Location,
-		}, api.WithContext(ctx)); err != nil {
+		}); err != nil {
 			return errors.Wrap(err, "patching CTF small icon")
 		}
 	} else {
-		if _, err := client.PatchConfigsCTFSmallIcon(&api.PatchConfigsCTFLogo{}, api.WithContext(ctx)); err != nil {
+		if _, err := client.PatchConfigsCTFSmallIcon(ctx, &api.PatchConfigsCTFLogo{}); err != nil {
 			return err
 		}
 	}
@@ -201,7 +206,7 @@ func updateSetup(ctx context.Context, client *api.Client, conf *Config) error {
 		params.MailPassword = conf.Email.Password
 	}
 
-	if err := client.PatchConfigs(params, api.WithContext(ctx)); err != nil {
+	if err := client.PatchConfigs(ctx, params); err != nil {
 		return &ErrClient{err: err}
 	}
 
@@ -226,9 +231,9 @@ func updateSetup(ctx context.Context, client *api.Client, conf *Config) error {
 			x := hex.EncodeToString(h.Sum(nil))
 
 			// Get the file from CTFd
-			fs, err := client.GetFiles(&api.GetFilesParams{
+			fs, err := client.GetFiles(ctx, &api.GetFilesParams{
 				Location: &f.Location,
-			}, api.WithContext(ctx))
+			})
 			if err != nil {
 				merr = multierr.Append(merr, errors.Wrapf(err, "getting file at %s", f.Location))
 				continue
@@ -243,12 +248,12 @@ func updateSetup(ctx context.Context, client *api.Client, conf *Config) error {
 			logger.Debug("uploading file",
 				zap.String("location", f.Location),
 			)
-			if _, err := client.PostFiles(&api.PostFilesParams{
+			if _, err := client.PostFiles(ctx, &api.PostFilesParams{
 				Files: []*api.InputFile{
 					(*api.InputFile)(f.File),
 				},
 				Location: &f.Location,
-			}, api.WithContext(ctx)); err != nil {
+			}); err != nil {
 				merr = multierr.Append(merr, err)
 			}
 		}
