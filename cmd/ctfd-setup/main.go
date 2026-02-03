@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"net/mail"
 	"os"
 	"os/signal"
 	"path/filepath"
@@ -510,10 +509,7 @@ func main() {
 		},
 		Action: run,
 		Authors: []any{
-			mail.Address{
-				Name:    "Lucas Tesson - PandatiX",
-				Address: "lucastesson@protonmail.com",
-			},
+			"CTFer.io's authors and contributors - ctfer-io@protonmail.com",
 		},
 		Version: version,
 		Metadata: map[string]any{
