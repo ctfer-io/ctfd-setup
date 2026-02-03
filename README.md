@@ -15,7 +15,7 @@ This is problematic for reproducibility or sharing configuration for debugging o
 
 Moreover, the setup API does not exist, so we had to map it to what the frontend calls in [go-ctfd](https://github.com/ctfer-io/go-ctfd/blob/main/api/setup.go).
 
-To fit those gaps, we built `ctfd-setup` on top of the CTFd API. This utility helps setup a CTFd instance from a YAML configuration file, CLI flags and environment variables.
+To fill those gaps, we built `ctfd-setup` on top of the CTFd API. This utility helps setup a CTFd instance from a YAML configuration file, CLI flags and environment variables.
 Thanks to this, you can integrate it using **GitHub Actions**, **Drone CI** or even as part of your **IaC provisionning**.
 
 With `ctfd-setup` you can **setup your CTFd in a second**.
@@ -44,7 +44,7 @@ mode: users
 ```
 
 **We encourage you to version this file** such that re-deployment is easy (e.g., for test purposes, or in case of a catastrophic failure of the infra during the event).
-Nevertheless, please do not commit the admin credentials ! Use `from_env` objects instead (refer to [the YAML Schema](#schema) for more info).
+Nevertheless, please do not commit the admin credentials ! Use `from_env` objects instead (refer to [the YAML Schema](#schema) for more info) or use [CLI overrides](examples/cli-override/).
 
 It could also deploy custom pages (like the index) as follows.
 This feature is not available in CLI, [GitHub Actions](#github-actions) and [Drone CI](#drone-ci).
