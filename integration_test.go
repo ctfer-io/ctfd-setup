@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"context"
 	_ "embed"
-	"os"
 	"os/exec"
 	"testing"
 
@@ -66,7 +65,7 @@ func Test_I_NoFile(t *testing.T) {
 	})
 
 	cmd := exec.CommandContext(t.Context(),
-		"go", "run", "cmd/ctfd-setup/main.go",
+		"./ctfd-setup",
 		"--url", CTFdURL,
 		"--appearance.name", "NoFileCTF",
 		"--appearance.description", "A CTF configured with no file",
@@ -74,6 +73,7 @@ func Test_I_NoFile(t *testing.T) {
 		"--admin.email", "ctfer-io@protonmail.com",
 		"--admin.password", "ctfer",
 	)
+	cmd.Env = envs
 
 	out, err := cmd.CombinedOutput()
 	require.NoError(t, err, string(out))
@@ -85,11 +85,12 @@ func Test_I_NoBrackets2024(t *testing.T) {
 	})
 
 	cmd := exec.CommandContext(t.Context(),
-		"go", "run", "cmd/ctfd-setup/main.go",
+		"./ctfd-setup",
 		"--url", CTFdURL,
 		"--directory", "examples/nobrackets2024",
 		"--file", "examples/nobrackets2024/.ctfd.yaml",
 	)
+	cmd.Env = envs
 
 	out, err := cmd.CombinedOutput()
 	require.NoError(t, err, string(out))
@@ -101,13 +102,14 @@ func Test_I_CLIOVerride(t *testing.T) {
 	})
 
 	cmd := exec.CommandContext(t.Context(),
-		"go", "run", "cmd/ctfd-setup/main.go",
+		"./ctfd-setup",
 		"--url", CTFdURL,
 		"--file", "examples/cli-override/.ctfd.yaml",
 		"--admin.name", "ctfer",
 		"--admin.email", "ctfer-io@protonmail.com",
 		"--admin.password", "ctfer",
 	)
+	cmd.Env = envs
 
 	out, err := cmd.CombinedOutput()
 	require.NoError(t, err, string(out))
@@ -119,11 +121,11 @@ func Test_I_EnvOverride(t *testing.T) {
 	})
 
 	cmd := exec.CommandContext(t.Context(),
-		"go", "run", "cmd/ctfd-setup/main.go",
+		"./ctfd-setup",
 		"--url", CTFdURL,
 		"--file", "examples/cli-override/.ctfd.yaml",
 	)
-	cmd.Env = append(os.Environ(),
+	cmd.Env = append(envs,
 		"ADMIN_NAME=ctfer",
 		"ADMIN_EMAIL=ctfer-io@protonmail.com",
 		"ADMIN_PASSWORD=ctfer",

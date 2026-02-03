@@ -59,12 +59,9 @@ jobs:
 
       - name: Run integration tests
         run: |
-          export GOCOVERDIR=coverdir
-          mkdir "$GOCOVERDIR"
+          go test ./ -run=^Test_I_ -v -cover -coverprofile=integration.cov
 
-          go test ./ -run=^Test_I_ -cover -coverprofile=integration.cov
-
-          go tool covdata textfmt "-i=$GOCOVERDIR" -o merged.cov
+          go tool covdata textfmt -i=coverdir -o merged.cov
           sed -i '/^\//d' merged.cov
         env:
           CTFD_URL: http://localhost:8000
