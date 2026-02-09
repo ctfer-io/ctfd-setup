@@ -49,6 +49,7 @@ jobs:
         run: |
           TARGET=schemastore/src/schemas/json/ctfd.json
 
+          cat "$TARGET"
           if [ ! -f "$TARGET" ]; then
             echo "changed=true" >> $GITHUB_OUTPUT
             exit 0
