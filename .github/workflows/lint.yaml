@@ -89,6 +89,8 @@ jobs:
           // Write back as JSON
           fs.writeFileSync(filePath, JSON.stringify(data, null, 2));
           '
+
+          cat schemastore/src/api/json/catalog.json
           cat schemastore/src/schema-validation.jsonc
 
       # The following is borrowed from Schemastore CI
