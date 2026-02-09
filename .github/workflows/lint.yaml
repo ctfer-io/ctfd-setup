@@ -107,3 +107,11 @@ jobs:
 
       - run: 'node ./cli.js check'
         working-directory: schemastore
+
+      # The following ensures the Prettier setup will work on tags, so no room is left to doubt on
+      # releases viability.
+      - name: Run Prettier to produce SchemaStore-aligned schema
+        run: |
+          npm install prettier
+          npm run prettier:fix
+        working-directory: schemastore
