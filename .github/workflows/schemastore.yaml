@@ -61,12 +61,12 @@ jobs:
           repository: ctfer-io/schemastore
           path: schemastore
           token: ${{ secrets.BOT_TOKEN }}
-
+      
       - name: Configure git identity
         if: steps.diff.outputs.changed == 'true'
         run: |
-          git config --global user.name "ctfer-io-bot"
           git config --global user.email "ctfer-io@protonmail.com"
+          git config --global user.name "CTFer.io Bot for CTFd-Setup"
 
       - name: Import GPG key
         if: steps.diff.outputs.changed == 'true'
