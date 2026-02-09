@@ -27,11 +27,16 @@ jobs:
           repository: SchemaStore/schemastore
           path: schemastore
 
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: './schemastore/package-lock.json'
+
       - name: Prune schemas # focus only on our own, fasten analysis
         run: |
           # Prune the catalog
           jq '.schemas |= map(select(.name == "ctfd-setup configuration file"))' schemastore/src/api/json/catalog.json > catalog.json
-          cat catalog.json
           mv catalog.json schemastore/src/api/json/catalog.json
 
           # Then delete all schemas and regen ctfd-setup one's
@@ -44,14 +49,39 @@ jobs:
           # Delete all other tests than our owns
           find schemastore/src/test -mindepth 1 -maxdepth 1 -type d ! -name ctfd -exec rm -rf {} +
 
+          # Simplify the Schema Validation JSONc
+          node -e '
+          const fs = require("fs");
+          const { parse } = require("jsonc-parser");
+
+          // Read JSONC
+          const filePath = "schemastore/src/schema-validation.jsonc";
+          const data = parse(fs.readFileSync(filePath, "utf8"));
+
+          // Keep only "ctfd.json" in the arrays
+          if (data.ajvNotStrictMode) {
+            data.ajvNotStrictMode = data.ajvNotStrictMode.filter(x => x === "ctfd.json");
+          }
+          if (data.highSchemaVersion) {
+            data.highSchemaVersion = data.highSchemaVersion.filter(x => x === "ctfd.json");
+          }
+          if (data.skiptest) {
+            data.skiptest = data.skiptest.filter(x => x === "ctfd.json");
+          }
+
+          // Keep only the "ctfd.json" key in options
+          if (data.options) {
+            data.options = Object.fromEntries(
+              Object.entries(data.options).filter(([k]) => k === "ctfd.json")
+            );
+          }
+
+          // Write back as JSON
+          fs.writeFileSync(filePath, JSON.stringify(data, null, 2));
+          '
+
       # The following is borrowed from Schemastore CI
       # Ref: https://github.com/SchemaStore/schemastore/blob/master/.github/workflows/validate.yml
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '18'
-          cache: 'npm'
-          cache-dependency-path: './schemastore/package-lock.json'
 
       - run: 'npm clean-install'
         working-directory: schemastore
