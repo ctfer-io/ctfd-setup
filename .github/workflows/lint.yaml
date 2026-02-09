@@ -59,11 +59,10 @@ jobs:
           const fs = require("fs");
           const { parse } = require("jsonc-parser");
 
-          // Read JSONC
           const filePath = "schemastore/src/schema-validation.jsonc";
           const data = parse(fs.readFileSync(filePath, "utf8"));
 
-          // Keep only "ctfd.json" in the arrays
+          // Filter arrays by exact match
           if (data.ajvNotStrictMode) {
             data.ajvNotStrictMode = data.ajvNotStrictMode.filter(x => x === "ctfd.json");
           }
@@ -74,8 +73,14 @@ jobs:
             data.skiptest = data.skiptest.filter(x => x === "ctfd.json");
           }
 
+          // Filter catalogEntryNoLintNameOrDescription by substring
+          if (data.catalogEntryNoLintNameOrDescription) {
+            data.catalogEntryNoLintNameOrDescription =
+              data.catalogEntryNoLintNameOrDescription.filter(x => x.includes("https://json-schema.org"));
+          }
+
           // Keep only the "ctfd.json" key in options
-          if (data.options) {
+          if (data.options && typeof data.options === "object") {
             data.options = Object.fromEntries(
               Object.entries(data.options).filter(([k]) => k === "ctfd.json")
             );
