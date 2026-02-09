@@ -2,6 +2,8 @@ name: Update SchemaStore if necessary
 
 on:
   push:
+    branches:
+      - "**"
     tags:
       - "v*"
 
@@ -58,53 +60,56 @@ jobs:
             echo "changed=true" >> $GITHUB_OUTPUT
           fi
 
-      - name: Checkout fork
-        if: steps.diff.outputs.changed == 'true'
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-        with:
-          repository: ctfer-io/schemastore
-          path: schemastore
-          token: ${{ secrets.BOT_TOKEN }}
+      - run: |
+          echo "Changed: ${{ steps.diff.outputs.changed }}"
 
-      - name: Import GPG key
-        if: steps.diff.outputs.changed == 'true'
-        uses: crazy-max/ghaction-import-gpg@e89d40939c28e39f97cf32126055eeae86ba74ec # v6.3.0
-        with:
-          gpg_private_key: ${{ secrets.BOT_GPG_PRIVATE_KEY }}
-          passphrase: ${{ secrets.BOT_GPG_PASSPHRASE }}
-          git_user_signingkey: true
-          git_commit_gpgsign: true
+      # - name: Checkout fork
+      #   if: steps.diff.outputs.changed == 'true'
+      #   uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      #   with:
+      #     repository: ctfer-io/schemastore
+      #     path: schemastore
+      #     token: ${{ secrets.BOT_TOKEN }}
+
+      # - name: Import GPG key
+      #   if: steps.diff.outputs.changed == 'true'
+      #   uses: crazy-max/ghaction-import-gpg@e89d40939c28e39f97cf32126055eeae86ba74ec # v6.3.0
+      #   with:
+      #     gpg_private_key: ${{ secrets.BOT_GPG_PRIVATE_KEY }}
+      #     passphrase: ${{ secrets.BOT_GPG_PASSPHRASE }}
+      #     git_user_signingkey: true
+      #     git_commit_gpgsign: true
       
-      - name: Configure git identity
-        if: steps.diff.outputs.changed == 'true'
-        run: |
-          git config --global user.email "ctfer-io@protonmail.com"
-          git config --global user.name "CTFer.io Bot for CTFd-Setup"
-          git config --global user.signingkey FED3BD93A8870B9F
+      # - name: Configure git identity
+      #   if: steps.diff.outputs.changed == 'true'
+      #   run: |
+      #     git config --global user.email "ctfer-io@protonmail.com"
+      #     git config --global user.name "CTFer.io Bot for CTFd-Setup"
+      #     git config --global user.signingkey FED3BD93A8870B9F
 
-      - name: Update schema file in fork
-        if: steps.diff.outputs.changed == 'true'
-        run: |
-          mv ctfd.json schemastore/src/schemas/json/ctfd.json
-          cd schemastore
-          branch="ctfd/update-schema-${GITHUB_REF_NAME}"
-          git checkout -b "$branch"
-          git add src/schemas/json/ctfd.json
-          git commit -S -m "chore(deps): update ctfd.json schema for ctfd-setup ${GITHUB_REF_NAME}"
-          git push -u origin "$branch"
+      # - name: Update schema file in fork
+      #   if: steps.diff.outputs.changed == 'true'
+      #   run: |
+      #     mv ctfd.json schemastore/src/schemas/json/ctfd.json
+      #     cd schemastore
+      #     branch="ctfd/update-schema-${GITHUB_REF_NAME}"
+      #     git checkout -b "$branch"
+      #     git add src/schemas/json/ctfd.json
+      #     git commit -S -m "chore(deps): update ctfd.json schema for ctfd-setup ${GITHUB_REF_NAME}"
+      #     git push -u origin "$branch"
 
-      - name: Open PR on SchemaStore
-        if: steps.diff.outputs.changed == 'true'
-        env:
-          GH_TOKEN: ${{ secrets.BOT_TOKEN }}
-        run: |
-          cd schemastore
-          branch="ctfd/update-schema-${GITHUB_REF_NAME}"
-          BASE=$(gh repo view SchemaStore/schemastore --json defaultBranchRef -q ".defaultBranchRef.name")
+      # - name: Open PR on SchemaStore
+      #   if: steps.diff.outputs.changed == 'true'
+      #   env:
+      #     GH_TOKEN: ${{ secrets.BOT_TOKEN }}
+      #   run: |
+      #     cd schemastore
+      #     branch="ctfd/update-schema-${GITHUB_REF_NAME}"
+      #     BASE=$(gh repo view SchemaStore/schemastore --json defaultBranchRef -q ".defaultBranchRef.name")
 
-          gh pr create \
-            --repo SchemaStore/schemastore \
-            --head ctfer-io:"$branch" \
-            --base $BASE \
-            --title "chore(deps): update ctfd.json schema for ctfd-setup ${GITHUB_REF_NAME}" \
-            --body "Automated update of the **ctfd.json** JSON schema after release ${GITHUB_REF_NAME}."
+      #     gh pr create \
+      #       --repo SchemaStore/schemastore \
+      #       --head ctfer-io:"$branch" \
+      #       --base $BASE \
+      #       --title "chore(deps): update ctfd.json schema for ctfd-setup ${GITHUB_REF_NAME}" \
+      #       --body "Automated update of the **ctfd.json** JSON schema after release ${GITHUB_REF_NAME}."
