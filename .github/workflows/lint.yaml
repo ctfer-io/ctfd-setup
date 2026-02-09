@@ -35,7 +35,7 @@ jobs:
           mv catalog.json schemastore/src/api/json/catalog.json
 
           # Then delete all schemas and regen ctfd-setup one's
-          rm schemastore/src/schemas/json/*
+          find schemastore/src/schemas/json -mindepth 1 -maxdepth 1 -type d ! -name schema-catalog.json -exec rm {} +
           go run cmd/ctfd-setup/main.go schema -o schemastore/src/schemas/json/ctfd.json
 
           # No negative tests to run, can drop them all
