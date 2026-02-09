@@ -26,12 +26,12 @@ jobs:
           restore-keys: ${{ runner.os }}-go-
 
       - name: Checkout SchemaStore
-        uses: actions/checkout@v4
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           repository: SchemaStore/schemastore
           path: schemastore
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@6044e13b5dc448c55e2357c09f80417699197238 # v6.2.0
         with:
           node-version: '18'
           cache: 'npm'
@@ -44,7 +44,7 @@ jobs:
           mv catalog.json schemastore/src/api/json/catalog.json
 
           # Then delete all schemas and regen ctfd-setup one's
-          find schemastore/src/schemas/json -type f ! -name schema-catalog.json -exec rm {} +
+          find schemastore/src/schemas/json -type f ! -name schema- catalog.json -exec rm {} +
           go run cmd/ctfd-setup/main.go schema -o schemastore/src/schemas/json/ctfd.json
 
           # No negative tests to run, can drop them all
@@ -93,13 +93,13 @@ jobs:
           fs.writeFileSync(filePath, JSON.stringify(data, null, 2));
           '
 
-          cat schemastore/src/api/json/catalog.json
-          cat schemastore/src/schema-validation.jsonc
-
       # The following is borrowed from Schemastore CI
       # Ref: https://github.com/SchemaStore/schemastore/blob/master/.github/workflows/validate.yml
 
       - run: 'npm clean-install'
+        working-directory: schemastore
+
+      - run: 'npm run typecheck'
         working-directory: schemastore
 
       - run: 'npm run eslint'
