@@ -2,8 +2,6 @@ name: Update SchemaStore if necessary
 
 on:
   push:
-    branches:
-      - "**"
     tags:
       - "v*"
 
