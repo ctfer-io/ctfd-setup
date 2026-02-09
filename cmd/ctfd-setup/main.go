@@ -575,7 +575,7 @@ func main() {
 					if err != nil {
 						return err
 					}
-					return os.WriteFile(o, schema, 0644)
+					return os.WriteFile(o, append(schema, '\n'), 0644)
 				},
 			},
 		},
