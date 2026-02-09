@@ -1,0 +1,50 @@
+name: 'Schemastore JSON schema validation'
+
+on: [push, pull_request]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Setup Go
+        uses: actions/setup-go@7a3fe6cf4cb3a834922a1244abfce67bcef6a0c5 # v6.2.0
+        with:
+          go-version-file: 'go.mod'
+
+      - name: Cache go modules
+        uses: actions/cache@cdf6c1fa76f9f475f3d7449005a359c84ca0f306 # v5.0.3
+        with:
+          path: ~/go/pkg/mod
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: ${{ runner.os }}-go-
+
+      - name: Checkout SchemaStore
+        uses: actions/checkout@v4
+        with:
+          repository: SchemaStore/schemastore
+          path: schemastore
+
+      - name: Generate schema
+        run: |
+            go run cmd/ctfd-setup/main.go schema -o schemastore/src/schemas/json/ctfd.json
+
+      # The following is borrowed from Schemastore CI
+      # Ref: https://github.com/SchemaStore/schemastore/blob/master/.github/workflows/validate.yml
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: './schemastore/package-lock.json'
+
+      - run: 'npm clean-install'
+        working-directory: schemastore
+
+      - run: 'npm run eslint'
+        working-directory: schemastore
+
+      - run: 'node ./cli.js check'
+        working-directory: schemastore
