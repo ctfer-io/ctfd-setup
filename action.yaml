@@ -173,7 +173,7 @@ inputs:
 
 runs:
   using: 'docker'
-  image: 'docker://ctferio/ctfd-setup:v1.8.0'
+  image: 'Dockerfile'
   env:
     FILE: ${{ inputs.file }}
     URL: ${{ inputs.url }}
