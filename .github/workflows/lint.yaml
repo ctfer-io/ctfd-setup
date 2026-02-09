@@ -79,7 +79,7 @@ jobs:
           // Filter catalogEntryNoLintNameOrDescription by substring
           if (data.catalogEntryNoLintNameOrDescription) {
             data.catalogEntryNoLintNameOrDescription =
-              data.catalogEntryNoLintNameOrDescription.filter(x == "https://www.schemastore.org/schema-catalog.json");
+              data.catalogEntryNoLintNameOrDescription.filter(x => x == "https://www.schemastore.org/schema-catalog.json");
           }
 
           // Keep only the "ctfd.json" key in options
