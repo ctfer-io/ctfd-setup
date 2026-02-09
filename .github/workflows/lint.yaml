@@ -30,11 +30,19 @@ jobs:
 
       - name: Prune schemas # focus only on our own, fasten analysis
         run: |
-          rm schemastore/src/schemas/json/*
+          # Prune the catalog
+          jq '.schemas |= map(select(.name == "ctfd-setup configuration file"))' schemastore/src/api/json/catalog.json > catalog.json
+          mv catalog.json schemastore/src/api/json/catalog.json
 
-      - name: Generate schema
-        run: |
-            go run cmd/ctfd-setup/main.go schema -o schemastore/src/schemas/json/ctfd.json
+          # Then delete all schemas and regen ctfd-setup one's
+          rm schemastore/src/schemas/json/*
+          go run cmd/ctfd-setup/main.go schema -o schemastore/src/schemas/json/ctfd.json
+
+          # No negative tests to run, can drop them all
+          rm -rf schemastore/src/negative_test/*
+
+          # Delete all other tests than our owns
+          find schemastore/src/test -mindepth 1 -maxdepth 1 -type d ! -name ctfd -exec rm -rf {} +
 
       # The following is borrowed from Schemastore CI
       # Ref: https://github.com/SchemaStore/schemastore/blob/master/.github/workflows/validate.yml
