@@ -26,15 +26,21 @@ jobs:
         with:
           go-version-file: 'go.mod'
 
-      - name: Generate schema
-        run: |
-          go run cmd/ctfd-setup/main.go schema -o ctfd.json
-
       - name: Checkout SchemaStore
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           repository: SchemaStore/schemastore
           path: schemastore
+
+      - name: Generate new schema
+        run: |
+          go run cmd/ctfd-setup/main.go schema -o schemastore/src/schemas/json/ctfd.json
+
+      - name: Run Prettier to produce SchemaStore-aligned schema
+        run: |
+          npm install prettier
+          npm run prettier:fix
+        working-directory: schemastore
 
       - name: Check for schema changes
         id: diff
@@ -46,7 +52,7 @@ jobs:
             exit 0
           fi
 
-          if diff -u "$TARGET" ctfd.json; then
+          if git diff --exit-code --quiet "$TARGET"; then
             echo "changed=false" >> $GITHUB_OUTPUT
           else
             echo "changed=true" >> $GITHUB_OUTPUT
