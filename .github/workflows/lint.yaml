@@ -69,6 +69,9 @@ jobs:
           if (data.highSchemaVersion) {
             data.highSchemaVersion = data.highSchemaVersion.filter(x => x === "ctfd.json");
           }
+          if (data.missingCatalogUrl) {
+            data.missingCatalogUrl = data.missingCatalogUrl.filter(x => x === "ctfd.json");
+          }
           if (data.skiptest) {
             data.skiptest = data.skiptest.filter(x => x === "ctfd.json");
           }
