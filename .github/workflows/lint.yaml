@@ -27,11 +27,11 @@ jobs:
           repository: SchemaStore/schemastore
           path: schemastore
 
-
       - name: Prune schemas # focus only on our own, fasten analysis
         run: |
           # Prune the catalog
           jq '.schemas |= map(select(.name == "ctfd-setup configuration file"))' schemastore/src/api/json/catalog.json > catalog.json
+          cat catalog.json
           mv catalog.json schemastore/src/api/json/catalog.json
 
           # Then delete all schemas and regen ctfd-setup one's
