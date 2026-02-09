@@ -1,6 +1,10 @@
 name: 'Schemastore JSON schema validation'
 
-on: [push, pull_request]
+on:
+  push: {}
+  pull_request: {}
+  schedule:
+    - cron: '0 0 * * *'
 
 jobs:
   lint:
@@ -50,6 +54,7 @@ jobs:
           find schemastore/src/test -mindepth 1 -maxdepth 1 -type d ! -name ctfd -exec rm -rf {} +
 
           # Simplify the Schema Validation JSONc
+          npm install jsonc-parser
           node -e '
           const fs = require("fs");
           const { parse } = require("jsonc-parser");
