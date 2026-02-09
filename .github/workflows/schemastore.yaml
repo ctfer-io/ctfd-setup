@@ -74,8 +74,6 @@ jobs:
       - name: Configure git identity
         if: steps.diff.outputs.changed == 'true'
         run: |
-          git config --global user.email "ctfer-io@protonmail.com"
-          git config --global user.name "CTFer.io Bot for CTFd-Setup"
           git config --global user.signingkey FED3BD93A8870B9F
 
       - name: Update schema file in fork
