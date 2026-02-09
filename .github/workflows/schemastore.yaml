@@ -85,7 +85,7 @@ jobs:
           branch="ctfd/update-schema-${GITHUB_REF_NAME}"
           git checkout -b "$branch"
           git add src/schemas/json/ctfd.json
-          git commit -m "chore(deps): update ctfd.json schema for ctfd-setup ${GITHUB_REF_NAME}"
+          git commit -s -m "chore(deps): update ctfd.json schema for ctfd-setup ${GITHUB_REF_NAME}"
           git push -u origin "$branch"
 
       # - name: Open PR to SchemaStore
