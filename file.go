@@ -49,7 +49,7 @@ func (file File) JSONSchema() *jsonschema.Schema {
 	subObj := jsonschema.NewProperties()
 	subObj.Set("from_file", &jsonschema.Schema{
 		Type:        "string",
-		Description: "The file to import content from.",
+		Description: "The file to import content from",
 	})
 
 	return &jsonschema.Schema{

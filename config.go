@@ -197,19 +197,19 @@ type (
 	// Email rules and server credentials
 	Email struct {
 		// The registration email
-		Registration EmailContent `yaml:"registration,omitempty" json:"registration,omitempty"`
+		Registration EmailContent `yaml:"registration" json:"registration"`
 
 		// The confirmation email
-		Confirmation EmailContent `yaml:"confirmation,omitempty" json:"confirmation,omitempty"`
+		Confirmation EmailContent `yaml:"confirmation" json:"confirmation"`
 
 		// The new account email
-		NewAccount EmailContent `yaml:"new_account,omitempty" json:"new_account,omitempty"`
+		NewAccount EmailContent `yaml:"new_account" json:"new_account"`
 
 		// The password reset email
-		PasswordReset EmailContent `yaml:"password_reset,omitempty" json:"password_reset,omitempty"`
+		PasswordReset EmailContent `yaml:"password_reset" json:"password_reset"`
 
 		// The password reset confirmation email
-		PasswordResetConfirmation EmailContent `yaml:"password_reset_confirmation,omitempty" json:"password_reset_confirmation,omitempty"`
+		PasswordResetConfirmation EmailContent `yaml:"password_reset_confirmation" json:"password_reset_confirmation"`
 
 		// The 'From:' to sent to mail with
 		From *string `yaml:"from,omitempty" json:"from,omitempty"`
@@ -238,7 +238,7 @@ type (
 		Subject *string `yaml:"subject,omitempty" json:"subject,omitempty"`
 
 		// Body (or content) or the email
-		Body *string `yaml:"body,omitempty"    json:"body,omitempty"`
+		Body *string `yaml:"body,omitempty" json:"body,omitempty"`
 	}
 
 	// Time settings of the CTF
@@ -268,10 +268,10 @@ type (
 	// Legal contents for players
 	Legal struct {
 		// The Terms of Services
-		TOS ExternalReference `yaml:"tos,omitempty" json:"tos,omitempty"`
+		TOS ExternalReference `yaml:"tos" json:"tos"`
 
 		// The Privacy Policy
-		PrivacyPolicy ExternalReference `yaml:"privacy_policy,omitempty" json:"privacy_policy,omitempty"`
+		PrivacyPolicy ExternalReference `yaml:"privacy_policy" json:"privacy_policy"`
 	}
 
 	ExternalReference struct {
@@ -285,10 +285,10 @@ type (
 	// Admin accesses
 	Admin struct {
 		// The administrator name. Immutable, or need the administrator to change the CTFd data AND the configuration file
-		Name FromEnv `yaml:"name,omitempty" json:"name,omitempty" jsonschema:"required"`
+		Name FromEnv `yaml:"name" json:"name" jsonschema:"required"`
 
 		// The administrator email address. Immutable, or need the administrator to change the CTFd data AND the configuration file
-		Email FromEnv `yaml:"email,omitempty" json:"email,omitempty" jsonschema:"required"`
+		Email FromEnv `yaml:"email" json:"email" jsonschema:"required"`
 
 		// The administrator password, recommended to use the varenvs. Immutable, or need the administrator to change the CTFd data AND the configuration file
 		Password FromEnv `yaml:"password" json:"password" jsonschema:"required"`
