@@ -91,8 +91,6 @@ jobs:
 
       - name: Open PR on SchemaStore
         if: steps.diff.outputs.changed == 'true'
-        env:
-          GH_TOKEN: ${{ secrets.BOT_TOKEN }}
         run: |
           cd schemastore
           branch="ctfd/update-schema-${GITHUB_REF_NAME}"
