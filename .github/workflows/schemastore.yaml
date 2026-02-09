@@ -76,6 +76,11 @@ jobs:
           passphrase: ${{ secrets.BOT_GPG_PASSPHRASE }}
           git_user_signingkey: true
           git_commit_gpgsign: true
+      
+      - name: Force git to use signing subkey
+        if: steps.diff.outputs.changed == 'true'
+        run: |
+          git config --global user.signingkey FED3BD93A8870B9F
 
       - name: Update schema file in fork
         if: steps.diff.outputs.changed == 'true'
