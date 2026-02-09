@@ -112,5 +112,7 @@ jobs:
       - name: Install dependencies
         run: npm install prettier
 
-      - run: 'npm run prettier'
+      - run: 'npm run prettier:fix'
         working-directory: schemastore
+
+      - run: 'cat schemastore/src/schemas/json/ctfd.json'
