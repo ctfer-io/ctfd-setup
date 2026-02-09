@@ -15,10 +15,10 @@ import (
 )
 
 var (
-	version = "dev"
-	commit  = ""
-	date    = ""
-	builtBy = ""
+	Version = "dev"
+	Commit  = ""
+	Date    = ""
+	BuiltBy = ""
 )
 
 const (
@@ -512,12 +512,12 @@ func main() {
 		Authors: []any{
 			"CTFer.io's authors and contributors - ctfer-io@protonmail.com",
 		},
-		Version: version,
+		Version: Version,
 		Metadata: map[string]any{
-			"version": version,
-			"commit":  commit,
-			"date":    date,
-			"builtBy": builtBy,
+			"version": Version,
+			"commit":  Commit,
+			"date":    Date,
+			"builtBy": BuiltBy,
 		},
 	}
 
@@ -534,7 +534,7 @@ func main() {
 func run(ctx context.Context, cmd *cli.Command) error {
 	log := ctfdsetup.Log()
 
-	shutdown, err := ctfdsetup.SetupOtelSDK(ctx, version)
+	shutdown, err := ctfdsetup.SetupOtelSDK(ctx, Version)
 	if err != nil {
 		return err
 	}
