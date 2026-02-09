@@ -107,3 +107,10 @@ jobs:
 
       - run: 'node ./cli.js check'
         working-directory: schemastore
+
+      # Run the prettier too, as it can be blocking PRs
+      - name: Install dependencies
+        run: npm install prettier
+
+      - run: 'npm run prettier'
+        working-directory: schemastore
