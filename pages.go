@@ -7,8 +7,8 @@ import (
 	"github.com/ctfer-io/go-ctfd/api"
 )
 
-func additionalPages(ctx context.Context, client *Client, pages []Page) error {
-	ctfdPages, err := client.GetPages(ctx, nil)
+func additionalPages(ctx context.Context, client *Client, pages []Page, opts ...Option) error {
+	ctfdPages, err := client.GetPages(ctx, nil, opts...)
 	if err != nil {
 		return err
 	}
@@ -34,7 +34,7 @@ func additionalPages(ctx context.Context, client *Client, pages []Page) error {
 				Draft:        page.Draft,
 				Hidden:       page.Hidden,
 				AuthRequired: page.AuthRequired,
-			}); err != nil {
+			}, opts...); err != nil {
 				return err
 			}
 		} else {
@@ -47,7 +47,7 @@ func additionalPages(ctx context.Context, client *Client, pages []Page) error {
 				Draft:        page.Draft,
 				Hidden:       page.Hidden,
 				AuthRequired: page.AuthRequired,
-			}); err != nil {
+			}, opts...); err != nil {
 				return err
 			}
 		}
@@ -56,7 +56,7 @@ func additionalPages(ctx context.Context, client *Client, pages []Page) error {
 	// DELETE
 	for _, ctfdP := range ctfdPages {
 		if !slices.Contains(cu, ctfdP.Route) {
-			if err := client.DeletePage(ctx, ctfdP.ID); err != nil {
+			if err := client.DeletePage(ctx, ctfdP.ID, opts...); err != nil {
 				return err
 			}
 		}
