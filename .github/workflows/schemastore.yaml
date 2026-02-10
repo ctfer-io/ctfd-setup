@@ -87,20 +87,18 @@ jobs:
       - name: Update schema file in fork
         if: steps.diff.outputs.changed == 'true'
         run: |
-          mv ctfd.json schemastore/src/schemas/json/ctfd.json
-          cd schemastore
           branch="ctfd/update-schema-${GITHUB_REF_NAME}"
           git checkout -b "$branch"
           git add src/schemas/json/ctfd.json
           git commit -S -m "chore(deps): update ctfd.json schema for ctfd-setup ${GITHUB_REF_NAME}"
           git push -u origin "$branch"
+        working-directory: schemastore
 
       - name: Open PR on SchemaStore
         if: steps.diff.outputs.changed == 'true'
         env:
           GH_TOKEN: ${{ secrets.BOT_TOKEN }}
         run: |
-          cd schemastore
           branch="ctfd/update-schema-${GITHUB_REF_NAME}"
           BASE=$(gh repo view SchemaStore/schemastore --json defaultBranchRef -q ".defaultBranchRef.name")
 
@@ -110,3 +108,4 @@ jobs:
             --base $BASE \
             --title "chore(deps): update ctfd.json schema for ctfd-setup ${GITHUB_REF_NAME}" \
             --body "Automated update of the **ctfd.json** JSON schema after release ${GITHUB_REF_NAME}."
+        working-directory: schemastore
