@@ -5,10 +5,9 @@ networks:
 
 services:
   jaeger:
-    image: jaegertracing/jaeger:2.8.0
+    image: jaegertracing/jaeger:2.15.0
     ports:
       - "16686:16686"   # Jaeger UI
-      - "14317:4317"    # OTLP gRPC ingest
     networks:
       - otel-demo
 
@@ -25,12 +24,13 @@ services:
       - otel-demo
 
   ctfd:
-    image: ctferio/ctfd:3.8.1-0.9.0
+    image: ctferio/ctfd:3.8.2-0.9.0
     ports:
       - "8000:8000"
     environment:
       OTEL_EXPORTER_OTLP_ENDPOINT: "dns://collector:4317"
       OTEL_EXPORTER_OTLP_INSECURE: "true"
+      OTEL_EXPORTER_OTLP_PROTOCOL: "grpc"
     depends_on:
       - collector
     networks:

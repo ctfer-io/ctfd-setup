@@ -13,6 +13,7 @@ As the tool supports OpenTelemetry, this example shows how to technically use it
     ```bash
     export OTEL_EXPORTER_OTLP_ENDPOINT=dns://localhost:4317
     export OTEL_EXPORTER_OTLP_INSECURE=true
+    export OTEL_EXPORTER_OTLP_PROTOCOL=grpc
     ```
 
 - Run `ctfd-setup` :smile:

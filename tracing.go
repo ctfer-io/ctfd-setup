@@ -6,8 +6,8 @@ import (
 	"runtime"
 	"strings"
 
+	"go.opentelemetry.io/contrib/exporters/autoexport"
 	"go.opentelemetry.io/otel"
-	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc"
 	"go.opentelemetry.io/otel/propagation"
 	"go.opentelemetry.io/otel/sdk/resource"
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
@@ -34,13 +34,15 @@ func newPropagator() propagation.TextMapPropagator {
 }
 
 func setupTraceProvider(ctx context.Context, r *resource.Resource) error {
-	traceExporter, err := otlptracegrpc.New(ctx)
+	exp, err := autoexport.NewSpanExporter(ctx)
 	if err != nil {
 		return err
 	}
 
 	tracerProvider = sdktrace.NewTracerProvider(
-		sdktrace.WithBatcher(traceExporter),
+		// We need to have the burden of a simple span processor as the process might be short-lived
+		// because a batch processor can not give enough time to export data...
+		sdktrace.WithSpanProcessor(sdktrace.NewSimpleSpanProcessor(exp)),
 		sdktrace.WithResource(r),
 	)
 	Tracer = tracerProvider.Tracer(serviceName)
@@ -48,13 +50,25 @@ func setupTraceProvider(ctx context.Context, r *resource.Resource) error {
 }
 
 func SetupOtelSDK(ctx context.Context, version string) (shutdown func(context.Context) error, err error) {
-	// Set up propagator.
+	// Set up propagator
 	prop := newPropagator()
 	otel.SetTextMapPropagator(prop)
 
-	// Ensure default SDK resources and the required service name are set.
+	// Get existing provider to avoid overrides, and if none set defines our own
+	existingProvider := otel.GetTracerProvider()
+	if _, isNoop := existingProvider.(tracenoop.TracerProvider); !isNoop {
+		// Configure lib tracer so it does not remain a noop thus drop traces
+		Tracer = existingProvider.Tracer(serviceName)
+
+		// Do nothing, it is externally managed
+		return func(_ context.Context) error {
+			return nil
+		}, nil
+	}
+
+	// Ensure default SDK resources and the required service name are set
 	r, err := resource.Merge(
-		resource.Default(),
+		resource.Environment(),
 		resource.NewWithAttributes(
 			semconv.SchemaURL,
 			semconv.ServiceName(serviceName),
@@ -65,7 +79,7 @@ func SetupOtelSDK(ctx context.Context, version string) (shutdown func(context.Co
 		return nil, err
 	}
 
-	// Set up trace provider.
+	// Set up trace provider
 	if nerr := setupTraceProvider(ctx, r); nerr != nil {
 		return nil, err
 	}
