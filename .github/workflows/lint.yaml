@@ -1,0 +1,117 @@
+name: 'Schemastore JSON schema validation'
+
+on:
+  push: {}
+  pull_request: {}
+  schedule:
+    - cron: '0 0 * * *'
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Setup Go
+        uses: actions/setup-go@7a3fe6cf4cb3a834922a1244abfce67bcef6a0c5 # v6.2.0
+        with:
+          go-version-file: 'go.mod'
+
+      - name: Cache go modules
+        uses: actions/cache@cdf6c1fa76f9f475f3d7449005a359c84ca0f306 # v5.0.3
+        with:
+          path: ~/go/pkg/mod
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: ${{ runner.os }}-go-
+
+      - name: Checkout SchemaStore
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          repository: SchemaStore/schemastore
+          path: schemastore
+
+      - uses: actions/setup-node@6044e13b5dc448c55e2357c09f80417699197238 # v6.2.0
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: './schemastore/package-lock.json'
+
+      - name: Prune schemas # focus only on our own, fasten analysis
+        run: |
+          # Prune the catalog
+          jq '.schemas |= map(select(.name == "ctfd-setup configuration file" or .name == "Schema Catalog"))' schemastore/src/api/json/catalog.json > catalog.json
+          mv catalog.json schemastore/src/api/json/catalog.json
+
+          # Then delete all schemas and regen ctfd-setup one's
+          find schemastore/src/schemas/json -type f ! -name schema-catalog.json -exec rm {} +
+          go run cmd/ctfd-setup/main.go schema -o schemastore/src/schemas/json/ctfd.json
+
+          # No negative tests to run, can drop them all
+          rm -rf schemastore/src/negative_test/*
+
+          # Delete all other tests than our owns
+          find schemastore/src/test -mindepth 1 -maxdepth 1 -type d ! -name ctfd -exec rm -rf {} +
+
+          # Simplify the Schema Validation JSONc
+          npm install jsonc-parser
+          node -e '
+          const fs = require("fs");
+          const { parse } = require("jsonc-parser");
+
+          const filePath = "schemastore/src/schema-validation.jsonc";
+          const data = parse(fs.readFileSync(filePath, "utf8"));
+
+          // Filter arrays by exact match
+          if (data.ajvNotStrictMode) {
+            data.ajvNotStrictMode = data.ajvNotStrictMode.filter(x => x === "ctfd.json");
+          }
+          if (data.highSchemaVersion) {
+            data.highSchemaVersion = data.highSchemaVersion.filter(x => x === "ctfd.json");
+          }
+          if (data.missingCatalogUrl) {
+            data.missingCatalogUrl = data.missingCatalogUrl.filter(x => x === "ctfd.json");
+          }
+          if (data.skiptest) {
+            data.skiptest = data.skiptest.filter(x => x === "ctfd.json");
+          }
+
+          // Filter catalogEntryNoLintNameOrDescription by substring
+          if (data.catalogEntryNoLintNameOrDescription) {
+            data.catalogEntryNoLintNameOrDescription =
+              data.catalogEntryNoLintNameOrDescription.filter(x => x == "https://www.schemastore.org/schema-catalog.json");
+          }
+
+          // Keep only the "ctfd.json" key in options
+          if (data.options && typeof data.options === "object") {
+            data.options = Object.fromEntries(
+              Object.entries(data.options).filter(([k]) => k === "ctfd.json")
+            );
+          }
+
+          // Write back as JSON
+          fs.writeFileSync(filePath, JSON.stringify(data, null, 2));
+          '
+
+      # The following is borrowed from Schemastore CI
+      # Ref: https://github.com/SchemaStore/schemastore/blob/master/.github/workflows/validate.yml
+
+      - run: 'npm clean-install'
+        working-directory: schemastore
+
+      - run: 'npm run typecheck'
+        working-directory: schemastore
+
+      - run: 'npm run eslint'
+        working-directory: schemastore
+
+      - run: 'node ./cli.js check'
+        working-directory: schemastore
+
+      # The following ensures the Prettier setup will work on tags, so no room is left to doubt on
+      # releases viability.
+      - name: Run Prettier to produce SchemaStore-aligned schema
+        run: |
+          npm install prettier
+          npm run prettier:fix
+        working-directory: schemastore

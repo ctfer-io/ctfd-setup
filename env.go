@@ -42,7 +42,7 @@ func (fe FromEnv) JSONSchema() *jsonschema.Schema {
 	subObj := jsonschema.NewProperties()
 	subObj.Set("from_env", &jsonschema.Schema{
 		Type:        "string",
-		Description: "The environment variable to look at.",
+		Description: "The environment variable to look at",
 	})
 
 	return &jsonschema.Schema{

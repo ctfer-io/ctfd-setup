@@ -1,0 +1,112 @@
+name: Update SchemaStore if necessary
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: read
+
+jobs:
+  update-schemastore:
+    name: Update SchemaStore
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      pull-requests: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Setup Go
+        uses: actions/setup-go@7a3fe6cf4cb3a834922a1244abfce67bcef6a0c5 # v6.2.0
+        with:
+          go-version-file: 'go.mod'
+
+      - name: Checkout SchemaStore
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          repository: SchemaStore/schemastore
+          path: schemastore
+
+      - name: Generate new schema
+        run: |
+          go run cmd/ctfd-setup/main.go schema -o schemastore/src/schemas/json/ctfd.json
+
+      - name: Run Prettier to produce SchemaStore-aligned schema
+        run: |
+          npm install prettier
+          npm run prettier:fix
+        working-directory: schemastore
+
+      - name: Check for schema changes
+        id: diff
+        run: |
+          TARGET=src/schemas/json/ctfd.json
+
+          cat "$TARGET"
+          if [ ! -f "$TARGET" ]; then
+            echo "changed=true" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+
+          if git diff --exit-code --quiet "$TARGET"; then
+            echo "changed=false" >> $GITHUB_OUTPUT
+          else
+            echo "changed=true" >> $GITHUB_OUTPUT
+          fi
+        working-directory: schemastore
+
+      - name: Checkout fork
+        if: steps.diff.outputs.changed == 'true'
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          repository: ctfer-io/schemastore
+          path: schemastore
+          token: ${{ secrets.BOT_TOKEN }}
+
+      - name: Import GPG key
+        if: steps.diff.outputs.changed == 'true'
+        uses: crazy-max/ghaction-import-gpg@e89d40939c28e39f97cf32126055eeae86ba74ec # v6.3.0
+        with:
+          gpg_private_key: ${{ secrets.BOT_GPG_PRIVATE_KEY }}
+          passphrase: ${{ secrets.BOT_GPG_PASSPHRASE }}
+          git_user_signingkey: true
+          git_commit_gpgsign: true
+      
+      - name: Configure git identity
+        if: steps.diff.outputs.changed == 'true'
+        run: |
+          git config --global user.email "ctfer-io@protonmail.com"
+          git config --global user.name "CTFer.io Bot for CTFd-Setup"
+          git config --global user.signingkey FED3BD93A8870B9F
+
+      - name: Update schema file in fork
+        if: steps.diff.outputs.changed == 'true'
+        run: |
+          mv ctfd.json schemastore/src/schemas/json/ctfd.json
+          cd schemastore
+          branch="ctfd/update-schema-${GITHUB_REF_NAME}"
+          git checkout -b "$branch"
+          git add src/schemas/json/ctfd.json
+          git commit -S -m "chore(deps): update ctfd.json schema for ctfd-setup ${GITHUB_REF_NAME}"
+          git push -u origin "$branch"
+
+      - name: Open PR on SchemaStore
+        if: steps.diff.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.BOT_TOKEN }}
+        run: |
+          cd schemastore
+          branch="ctfd/update-schema-${GITHUB_REF_NAME}"
+          BASE=$(gh repo view SchemaStore/schemastore --json defaultBranchRef -q ".defaultBranchRef.name")
+
+          gh pr create \
+            --repo SchemaStore/schemastore \
+            --head ctfer-io:"$branch" \
+            --base $BASE \
+            --title "chore(deps): update ctfd.json schema for ctfd-setup ${GITHUB_REF_NAME}" \
+            --body "Automated update of the **ctfd.json** JSON schema after release ${GITHUB_REF_NAME}."
