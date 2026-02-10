@@ -34,7 +34,7 @@ jobs:
 
       - name: Generate new schema
         run: |
-          go run cmd/ctfd-setup/main.go schema -o ctfd.json
+          go run cmd/ctfd-setup/main.go schema -o schemastore/src/schemas/json/ctfd.json
 
       - name: Run Prettier to produce SchemaStore-aligned schema
         run: |
@@ -46,7 +46,6 @@ jobs:
         id: diff
         run: |
           TARGET=src/schemas/json/ctfd.json
-          cp ../ctfd.json $TARGET
 
           if [ ! -f "$TARGET" ]; then
             echo "changed=true" >> $GITHUB_OUTPUT
@@ -65,7 +64,7 @@ jobs:
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           repository: ctfer-io/schemastore
-          path: schemastore
+          path: schemastore-fork
           token: ${{ secrets.BOT_TOKEN }}
 
       - name: Import GPG key
@@ -87,13 +86,13 @@ jobs:
       - name: Update schema file in fork
         if: steps.diff.outputs.changed == 'true'
         run: |
-          cp ../ctfd.json src/schemas/json/ctfd.json
+          cp schemastore/src/schemas/json/ctfd.json schemastore-fork/src/schemas/json/ctfd.json
+          cd schemastore-fork
           branch="ctfd/update-schema-${GITHUB_REF_NAME}"
           git checkout -b "$branch"
           git add src/schemas/json/ctfd.json
           git commit -S -m "chore(deps): update ctfd.json schema for ctfd-setup ${GITHUB_REF_NAME}"
           git push -u origin "$branch"
-        working-directory: schemastore
 
       - name: Open PR on SchemaStore
         if: steps.diff.outputs.changed == 'true'
@@ -109,4 +108,4 @@ jobs:
             --base $BASE \
             --title "chore(deps): update ctfd.json schema for ctfd-setup ${GITHUB_REF_NAME}" \
             --body "Automated update of the **ctfd.json** JSON schema after release ${GITHUB_REF_NAME}."
-        working-directory: schemastore
+        working-directory: schemastore-fork
