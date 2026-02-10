@@ -34,7 +34,7 @@ jobs:
 
       - name: Generate new schema
         run: |
-          go run cmd/ctfd-setup/main.go schema -o schemastore/src/schemas/json/ctfd.json
+          go run cmd/ctfd-setup/main.go schema -o ctfd.json
 
       - name: Run Prettier to produce SchemaStore-aligned schema
         run: |
@@ -46,8 +46,8 @@ jobs:
         id: diff
         run: |
           TARGET=src/schemas/json/ctfd.json
+          cp ../ctfd.json $TARGET
 
-          cat "$TARGET"
           if [ ! -f "$TARGET" ]; then
             echo "changed=true" >> $GITHUB_OUTPUT
             exit 0
@@ -87,6 +87,7 @@ jobs:
       - name: Update schema file in fork
         if: steps.diff.outputs.changed == 'true'
         run: |
+          cp ../ctfd.json src/schemas/json/ctfd.json
           branch="ctfd/update-schema-${GITHUB_REF_NAME}"
           git checkout -b "$branch"
           git add src/schemas/json/ctfd.json
