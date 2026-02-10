@@ -10,6 +10,7 @@ import (
 	ctfdsetup "github.com/ctfer-io/ctfd-setup"
 	"github.com/ctfer-io/go-ctfd/api"
 	"github.com/stretchr/testify/require"
+	"go.opentelemetry.io/otel/trace/noop"
 	"gopkg.in/yaml.v3"
 )
 
@@ -133,6 +134,29 @@ func Test_I_EnvOverride(t *testing.T) {
 
 	out, err := cmd.CombinedOutput()
 	require.NoError(t, err, string(out))
+}
+
+func Test_I_Tracing(t *testing.T) {
+	ctx := t.Context()
+	t.Cleanup(func() {
+		require.NoError(t, reset(context.WithoutCancel(ctx)))
+	})
+
+	// You can define your own OTel setup
+	tp := noop.NewTracerProvider()
+
+	// Then load a configuration
+	conf := ctfdsetup.NewConfig()
+
+	dec := yaml.NewDecoder(bytes.NewReader(minimalConf))
+	dec.KnownFields(true)
+
+	err := dec.Decode(conf)
+	require.NoError(t, err)
+
+	// And set things up!
+	err = ctfdsetup.Setup(ctx, CTFdURL, "", conf, ctfdsetup.WithTracerProvider(tp))
+	require.NoError(t, err)
 }
 
 func reset(ctx context.Context) error {

@@ -11,6 +11,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/urfave/cli/v3"
 	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
 	"gopkg.in/yaml.v3"
 )
 
@@ -62,6 +63,18 @@ func main() {
 				Sources:  cli.EnvVars("API_KEY", "PLUGIN_API_KEY"),
 				Category: management,
 				Local:    true,
+			},
+			&cli.StringFlag{
+				Name:     "log-level",
+				Usage:    "Use to specify the level of logging.",
+				Sources:  cli.EnvVars("LOG_LEVEL", "PLUGIN_LOG_LEVEL"),
+				Category: management,
+				Value:    "info",
+				Action: func(_ context.Context, _ *cli.Command, lvl string) error {
+					_, err := zapcore.ParseLevel(lvl)
+					return err
+				},
+				Local: true,
 			},
 			// Configuration file
 			// => Appearance
@@ -597,25 +610,27 @@ func main() {
 	defer stop()
 
 	if err := app.Run(ctx, os.Args); err != nil {
-		ctfdsetup.Log().Error("fatal error", zap.Error(err))
+		ctfdsetup.Log().Error(ctx, "fatal error", zap.Error(err))
 		os.Exit(1)
 	}
 }
 
 func run(ctx context.Context, cmd *cli.Command) error {
-	log := ctfdsetup.Log()
-
-	shutdown, err := ctfdsetup.SetupOtelSDK(ctx, Version)
+	// Init OTel exporters
+	out, err := ctfdsetup.SetupOTelSDK(ctx, Version)
 	if err != nil {
 		return err
 	}
 	defer func() {
-		if err := shutdown(ctx); err != nil {
-			log.Error("shuttding down tracer provider",
+		if err := out.Shutdown(ctx); err != nil {
+			ctfdsetup.Log().Error(ctx, "shuttding down tracer provider",
 				zap.Error(err),
 			)
 		}
 	}()
+
+	// Upsert logger so it takes its configuration (OTel + level)
+	log := ctfdsetup.UpsertLogger(out.LogProvider, cmd.String("log-level"))
 
 	logo, err := filePtr(cmd, "theme.logo")
 	if err != nil {
@@ -658,7 +673,7 @@ func run(ctx context.Context, cmd *cli.Command) error {
 
 	// Read and unmarshal setup config file if any
 	if f := cmd.String("file"); f != "" {
-		log.Info("loading configuration file", zap.String("file", f))
+		log.Info(ctx, "loading configuration file", zap.String("file", f))
 
 		fd, err := os.Open(f)
 		if err != nil {
@@ -670,7 +685,7 @@ func run(ctx context.Context, cmd *cli.Command) error {
 
 		dec := yaml.NewDecoder(fd)
 		dec.KnownFields(true)
-		if err := dec.Decode(&conf); err != nil {
+		if err := dec.Decode(conf); err != nil {
 			return errors.Wrap(err, "unmarshalling configuration")
 		}
 	}
@@ -765,7 +780,12 @@ func run(ctx context.Context, cmd *cli.Command) error {
 	if !cmd.IsSet("url") {
 		return errors.New("url flag not set, is required")
 	}
-	return ctfdsetup.Setup(ctx, cmd.String("url"), cmd.String("api_key"), conf)
+	return ctfdsetup.Setup(ctx,
+		cmd.String("url"),
+		cmd.String("api_key"),
+		conf,
+		ctfdsetup.WithTracerProvider(out.TracerProvider),
+	)
 }
 
 func filePtr(cmd *cli.Command, key string) (*ctfdsetup.File, error) {
