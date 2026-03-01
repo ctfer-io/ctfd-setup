@@ -75,6 +75,9 @@ jobs:
           if (data.skiptest) {
             data.skiptest = data.skiptest.filter(x => x === "ctfd.json");
           }
+          if (data.coverage) {  
+            data.coverage = data.coverage.filter(x => x.schema === "ctfd.json");
+          }
 
           // Filter catalogEntryNoLintNameOrDescription by substring
           if (data.catalogEntryNoLintNameOrDescription) {
