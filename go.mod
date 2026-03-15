@@ -11,7 +11,7 @@ require (
 	github.com/xeipuuv/gojsonschema v1.2.0
 	go.opentelemetry.io/contrib/bridges/otelzap v0.17.0
 	go.opentelemetry.io/contrib/exporters/autoexport v0.67.0
-	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.65.0
+	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.67.0
 	go.opentelemetry.io/otel v1.42.0
 	go.opentelemetry.io/otel/log v0.18.0
 	go.opentelemetry.io/otel/sdk v1.42.0
