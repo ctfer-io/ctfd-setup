@@ -7,7 +7,7 @@ require (
 	github.com/invopop/jsonschema v0.13.0
 	github.com/pkg/errors v0.9.1
 	github.com/stretchr/testify v1.11.1
-	github.com/urfave/cli/v3 v3.7.0
+	github.com/urfave/cli/v3 v3.8.0
 	github.com/xeipuuv/gojsonschema v1.2.0
 	go.opentelemetry.io/contrib/bridges/otelzap v0.17.0
 	go.opentelemetry.io/contrib/exporters/autoexport v0.67.0
