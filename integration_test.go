@@ -49,7 +49,7 @@ func Test_I_Minimal(t *testing.T) {
 	}, api.WithContext(ctx))
 	require.NoError(t, err)
 
-	token, err := client.PostTokens(&api.PostTokensParams{
+	token, _, err := client.PostTokens(&api.PostTokensParams{
 		Expiration:  "2222-01-01",
 		Description: "Automation API key.",
 	})

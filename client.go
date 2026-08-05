@@ -68,6 +68,10 @@ func (cli *Client) Bare(ctx context.Context, opts ...Option) (bool, error) {
 	return res.StatusCode == 200, nil // 302 if already setup
 }
 
+func dropMeta[T any](res T, _ *api.MetaResponse, err error) (T, error) {
+	return res, err
+}
+
 func (cli *Client) Login(ctx context.Context, params *api.LoginParams, opts ...Option) error {
 	ctx, span := StartAPISpan(ctx, getTracer(opts...))
 	defer span.End()
@@ -94,7 +98,7 @@ func (cli *Client) GetPages(ctx context.Context, params *api.GetPagesParams, opt
 
 	LogAPICall(ctx)
 
-	return cli.sub.GetPages(params, apiOptions(ctx)...)
+	return dropMeta(cli.sub.GetPages(params, apiOptions(ctx)...))
 }
 
 func (cli *Client) PatchPage(ctx context.Context, id int, params *api.PatchPageParams, opts ...Option) (*api.Page, error) {
@@ -103,7 +107,7 @@ func (cli *Client) PatchPage(ctx context.Context, id int, params *api.PatchPageP
 
 	LogAPICall(ctx)
 
-	return cli.sub.PatchPage(strconv.Itoa(id), params, apiOptions(ctx)...)
+	return dropMeta(cli.sub.PatchPage(strconv.Itoa(id), params, apiOptions(ctx)...))
 }
 
 func (cli *Client) PostPages(ctx context.Context, params *api.PostPagesParams, opts ...Option) (*api.Page, error) {
@@ -112,7 +116,7 @@ func (cli *Client) PostPages(ctx context.Context, params *api.PostPagesParams, o
 
 	LogAPICall(ctx)
 
-	return cli.sub.PostPages(params, apiOptions(ctx)...)
+	return dropMeta(cli.sub.PostPages(params, apiOptions(ctx)...))
 }
 
 func (cli *Client) DeletePage(ctx context.Context, id int, opts ...Option) error {
@@ -121,7 +125,8 @@ func (cli *Client) DeletePage(ctx context.Context, id int, opts ...Option) error
 
 	LogAPICall(ctx)
 
-	return cli.sub.DeletePage(strconv.Itoa(id), apiOptions(ctx)...)
+	_, err := cli.sub.DeletePage(strconv.Itoa(id), apiOptions(ctx)...)
+	return err
 }
 
 // region files
@@ -132,7 +137,7 @@ func (cli *Client) GetFiles(ctx context.Context, params *api.GetFilesParams, opt
 
 	LogAPICall(ctx)
 
-	return cli.sub.GetFiles(params, apiOptions(ctx)...)
+	return dropMeta(cli.sub.GetFiles(params, apiOptions(ctx)...))
 }
 
 func (cli *Client) PostFiles(ctx context.Context, params *api.PostFilesParams, opts ...Option) ([]*api.File, error) {
@@ -141,7 +146,7 @@ func (cli *Client) PostFiles(ctx context.Context, params *api.PostFilesParams, o
 
 	LogAPICall(ctx)
 
-	return cli.sub.PostFiles(params, apiOptions(ctx)...)
+	return dropMeta(cli.sub.PostFiles(params, apiOptions(ctx)...))
 }
 
 // region logos/icons
@@ -152,7 +157,7 @@ func (cli *Client) PatchConfigsCTFLogo(ctx context.Context, params *api.PatchCon
 
 	LogAPICall(ctx)
 
-	return cli.sub.PatchConfigsCTFLogo(params, apiOptions(ctx)...)
+	return dropMeta(cli.sub.PatchConfigsCTFLogo(params, apiOptions(ctx)...))
 }
 
 func (cli *Client) PatchConfigsCTFSmallIcon(ctx context.Context, params *api.PatchConfigsCTFLogo, opts ...Option) (*api.ThemeImage, error) {
@@ -161,7 +166,7 @@ func (cli *Client) PatchConfigsCTFSmallIcon(ctx context.Context, params *api.Pat
 
 	LogAPICall(ctx)
 
-	return cli.sub.PatchConfigsCTFSmallIcon(params, apiOptions(ctx)...)
+	return dropMeta(cli.sub.PatchConfigsCTFSmallIcon(params, apiOptions(ctx)...))
 }
 
 // region configs
@@ -172,5 +177,6 @@ func (cli *Client) PatchConfigs(ctx context.Context, params *api.PatchConfigsPar
 
 	LogAPICall(ctx)
 
-	return cli.sub.PatchConfigs(params, apiOptions(ctx)...)
+	_, err := cli.sub.PatchConfigs(params, apiOptions(ctx)...)
+	return err
 }
